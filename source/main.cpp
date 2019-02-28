@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
 
 	epoll_event tep;
-	std::vector<epoll_event> epv;
+	std::vector<epoll_event> epv(16);
 	tep.events = EPOLLIN;
 	tep.data.fd = fd;
 
