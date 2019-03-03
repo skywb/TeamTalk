@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 #include <memory>
 #include <unistd.h>
+#include <vector>
 
 
 class User
@@ -27,6 +27,7 @@ public:
 
 	bool passwordIsEqual(std::string psw) { return psw == password; }
 	void setPassword(std::string psw) { password = psw; }
+	std::string getPassword() { return password;}
 
 	std::shared_ptr<std::vector<Account> > getFriends() {
 		/* TODO: 加锁 */
@@ -39,6 +40,7 @@ public:
 	}
 
 	void setFriends(std::string fs) { friends = fs; }
+	std::string getSqlFriends() { return friends;}
 
 private:
 	Account id;
@@ -53,19 +55,5 @@ private:
 
 
 
-void User::splitFriends() {
-	friends_ptr = std::make_shared<std::vector<Account>>(new std::vector<Account>);
-	auto &p = friends_ptr;
-	Account tmp = 0;
-	for(auto it = friends.begin(); it != friends.end(); ++it)
-		if(*it != ';') {
-			tmp *= 10;
-			tmp += *it - '0';
-		} else {
-			p->push_back(tmp);
-			tmp = 0;
-		}
-	p->push_back(tmp);
-}
 
 #endif /* end of include guard: USER_H_9YZLOATV */
