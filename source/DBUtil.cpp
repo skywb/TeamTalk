@@ -83,7 +83,6 @@ User* DBUtil::UserDao::Obtain(User::Account id) {
 		res = stmt->executeQuery();
 
 		User *user = new User();
-
 		try {
 
 			if(res->next()) {
