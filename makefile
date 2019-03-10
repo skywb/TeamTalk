@@ -2,14 +2,14 @@
 VPATH=source:header
 
 OBJ=DBUtil.o User.o
-CPPFLAGS= -I header -lmysqlcppconn
+CPPFLAGS= -I header
 
 
 main : $(OBJ)
-	g++ $(OBJ) $(CPPFLAGS) -o main
+	g++ $(OBJ) $(CPPFLAGS) -lmysqlcppconn -o main
 
 %.o : %.h %.c
-	g++ -c $(CPPFLAGS) %<
+	g++ $(CPPFLAGS) -c builder/%<
 
 
 
@@ -25,3 +25,22 @@ compileObj : $(OBJ)
 
 clean : 
 	rm *.o
+
+
+
+
+
+
+
+
+
+
+SRC_DIR := ./source
+BUILD_DIR := ./build
+OBJ_DIR := $(BUILD_DIR)/obj
+HEADER_DIR := ./header
+
+CPPFLAGS := -Wall -I $(HEADER_DIR)
+
+
+
