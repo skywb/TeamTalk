@@ -9,7 +9,6 @@ class MyProtocol
 {
 public:
 
-
 	enum CMD {
 		INVALID = 0,
 		LOGIN = 1,
@@ -24,12 +23,13 @@ public:
 	}
 
 	MyProtocol (const char *p);
-	virtual ~MyProtocol ();
+	virtual ~MyProtocol () {}
 
 	void setAccount(User::Account account) { _id = account; }
 	void setObjAccount(User::Account account) { _objId = account; }
-	void setMsgLength(unsigned int length) { _length = length; }
+	//void setMsgLength(unsigned int length) { _length = length; }
 	void setMsg(const char * msg); 
+	void setCmd(CMD cmd);
 	CMD getCmd() { return _cmd; }
 	User::Account getAccount () { return _id; }
 	User::Account getObjAccount () { return _objId; }
@@ -53,10 +53,6 @@ private:
 
 };
 
-//第0位 CMD-'0', 1-10 自己ID， 11-20 目标ID, 最后3位 length
-size_t MyProtocol::_headLength = 1 + 10 + 10 + 3;
-// 999 + headlength  + 结束符 == 1024
-size_t MyProtocol::_bodyLength = 999;
 
 
 
