@@ -11,18 +11,71 @@
 #include <sys/types.h>
 #include <pthread.h>
 
-#include "sockUtil.h"
+#include "Connecter.h"
 
 
 namespace IM {
-	/* TODO:  <05-04-19, yourname> */
-	class Event;
-	/* TODO:  <05-04-19, yourname> */
-	class Task;
 
+	/*
+	 * IM事件
+	 */
+	class Event
+	{
+	public:
+
+		enum EVENTS {
+			READABLE = 0x10,
+			WRITEABLE = 0x20
+		};
+
+		Event (EVENTS e) : event(e) { }
+
+		int getScoket() { return fd; }
+
+		virtual EPOLL_EVENTS getEvent() {
+			switch (event) {
+				case READABLE:
+					return EPOLLIN;
+				case WRITEABLE:
+					return EPOLLOUT;
+			}
+			return EPOLLIN;
+		}	
+
+		virtual ~Event () {}
+	
+	protected:
+		int fd;
+		EVENTS event;
+	};
+
+
+	/*
+	 * 任务基类， 每个工作线程获得该基类指针，
+	 * 不同的任务都派生自该基类， 实现doit任务处理函数
+	 * 在每个工作线程中， 拿到该Task之后调用doit执行任务.
+	 */
+	class Task {
+	public:
+		Task(Event event, std::shared_ptr<Connecter> connecter_ptr) : 
+			m_eve(event), p_con(connecter_ptr) { }
+
+		virtual void doit();
+
+		~Task() { }
+	protected:
+		Event m_eve;
+		std::shared_ptr<Connecter> p_con;
+	};
+
+
+	/*
+	 * 任务工作线程， 其中callBack是线程回调函数
+	 */
 	class TaskThread
 	{
 	public:
+		//typedef  epoll_event Event;
 		typedef void* (*callBack) (void *);
 		TaskThread (callBack callBack_fun);
 		virtual ~TaskThread ();
@@ -52,14 +105,15 @@ namespace IM {
 		int sock_listen;
 		int epoll_root;
 
+		size_t event_count;
+
 		void* (*TaskThreadCallBack) (void* arg);
 
 		std::queue<Event> que;
 		std::mutex que_mutex;
 
-		
+		std::vector<epoll_event> events;
 		std::vector<TaskThread> threads;
-
 
 		static IMReactor* _thisReactor;
 	};

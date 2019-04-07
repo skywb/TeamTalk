@@ -3,7 +3,7 @@
 #include <sys/socket.h>
 #include <netinet/ip.h>
 
-namespace BlueCat {
+namespace IM {
 
 	bool Buffer::addMsg(const char* msg) {
 		size_t len = strlen(msg);

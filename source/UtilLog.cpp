@@ -1,7 +1,10 @@
-#include "UtilLog.h"
 #include <memory>
 #include <mutex>
+#include <assert.h>
+#include <iostream>
 #include <boost/date_time/gregorian/gregorian.hpp>
+
+#include "UtilLog.h"
 
 using namespace Util;
 
@@ -12,7 +15,7 @@ void Log::init(const char* logFilePath) {
 }
 
 Log::Log (const char* logFilePath) {
-	assert(_LogInstance == nullptr);
+	::assert(_LogInstance == nullptr);
 	//if(_LogInstance != nullptr) 
 	//	std::cout << "_this != nullptr" << std::endl;
 

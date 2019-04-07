@@ -9,7 +9,7 @@
 #include <cstring>
 #include <vector>
 
-namespace BlueCat {
+namespace IM {
 
 	class Buffer
 	{
@@ -36,8 +36,8 @@ namespace BlueCat {
 	
 	private:
 		static const unsigned int MSGMAXSIZE = BUFSIZ;
-		size_t _length;
 		char * buf;
+		size_t _length;
 	};
 
 
