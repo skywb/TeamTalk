@@ -7,6 +7,7 @@
 #include <mutex>
 #include <memory>
 #include <cstring>
+#include <queue>
 #include <vector>
 
 namespace IM {
@@ -27,6 +28,10 @@ namespace IM {
 		}
 		virtual ~Buffer () {
 			delete[] buf;
+		}
+
+		size_t getSize() {
+			return _length;
 		}
 
 		bool addMsg(const char* msg);
@@ -51,6 +56,8 @@ namespace IM {
 		virtual ~Connecter();
 
 		virtual bool send(char* msg);
+		virtual bool send();
+
 		virtual int recive(char* buf);
 		virtual bool isConnected() {
 			std::lock_guard<std::mutex> lock(_mutex);
@@ -59,7 +66,7 @@ namespace IM {
 	
 	protected:
 		int _sockfd;
-		std::vector<Buffer> _bufque;
+		std::queue<Buffer> _bufque;
 		std::mutex _mutex;
 		bool connected;
 	};

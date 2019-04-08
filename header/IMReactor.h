@@ -30,6 +30,8 @@ namespace IM {
 
 		Event (EVENTS e) : event(e) { }
 
+		void setScok(int _fd) { fd = _fd; }
+
 		int getScoket() { return fd; }
 
 		virtual EPOLL_EVENTS getEvent() {
@@ -69,6 +71,23 @@ namespace IM {
 	};
 
 
+
+	class WriteableTask : public Task
+	{
+	public:
+		WriteableTask (Event event, std::shared_ptr<Connecter> connecter_ptr) : 
+			Task(event, connecter_ptr) { }
+
+		virtual ~WriteableTask () { }
+
+
+		void doit() override ;
+
+	};
+
+
+
+
 	/*
 	 * 任务工作线程， 其中callBack是线程回调函数
 	 */
@@ -97,6 +116,8 @@ namespace IM {
 	
 		static IMReactor* getInstances();
 		static IMReactor* IMReactorInit(char* IP, uint16_t port);
+		static void addEventListen (Event event);
+		void eventAdd(Event event);
 
 		void loop();
 

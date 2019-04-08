@@ -89,8 +89,8 @@ void IMReactor::loop() {
 		{std::lock_guard<std::mutex> lock(que_mutex);
 			while(!que.empty()) {
 				auto& eve = que.front();
-				/* TODO: 添加监听事件 */
 				epoll_event event;
+				event.events = eve.getEvent();
 				event.data.fd = eve.getScoket();
 				epoll_ctl(epoll_root, EPOLL_CTL_ADD, eve.getScoket(), &event);
 				event_count++;
@@ -111,9 +111,20 @@ void IMReactor::loop() {
 			} else {
 				if(cur.events == EPOLLIN) {
 					//可读 
+					/*
+					 * 根据套接字获取connecter
+					 * 创建Task
+					 * 分配工作线程
+					 */
 					
 				} else {
 					//可写
+					/*
+					 * 根据套接字获取connecter
+					 * 创建新的事件
+					 * 创建WriteableTask
+					 * 将task分配给工作线程
+					 */
 
 				}
 
@@ -125,6 +136,18 @@ void IMReactor::loop() {
 	}
 
 }
+
+
+void IMReactor::addEventListen(Event event) {
+	IMReactor* reactor = getInstances();
+	reactor->eventAdd(event);
+}
+
+void IMReactor::eventAdd(Event event) {
+	std::lock_guard<std::mutex> lock(que_mutex);
+	que.push(event);
+}
+
 
 
 
@@ -139,6 +162,18 @@ void* IMTaskCallBack (void *arg) {
 	}
 
 }
+
+
+void WriteableTask::doit() {
+	/* TODO:  <07-04-19, yourname> */
+	/* 做可写事件处理
+	 * 将缓冲区的数据写入套接字内
+	 */
+
+	p_con->send();
+
+}
+
 
 
 

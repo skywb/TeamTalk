@@ -1,7 +1,9 @@
-#include "Connecter.h"
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/ip.h>
+
+#include "Connecter.h"
+#include "IMReactor.h"
 
 namespace IM {
 
@@ -41,13 +43,36 @@ namespace IM {
 			return false;
 		}
 		else if(re < len) {
-			_bufque.push_back(Buffer(msg+re));
+			_bufque.push(Buffer(msg+re));
 			/* TODO: 添加可写事件 */
 			return true;
 		}
 
 		return true;
 	}
+
+	/*
+	 * 套接字可写
+	 * 将缓冲区内的内容写入
+	 * 如果缓冲区中的内容全部发送返回true
+	 * 否则返回false
+	 */
+	bool Connecter::send() {
+		while(!_bufque.empty())
+		{
+
+			auto& buf = _bufque.front();
+			int n = write(_sockfd, buf.c_str(), buf.getSize());
+			if(n < buf.getSize()) 
+			{
+				/* TODO: 当前缓冲区发送了n个字节， 应减去前n个字符 */
+				break;
+			}
+			else _bufque.pop();
+		}
+		return _bufque.empty();
+	}
+
 	int Connecter::recive(char* buf) {
 		std::lock_guard<std::mutex> lock(_mutex);
 
