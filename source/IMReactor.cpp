@@ -58,7 +58,7 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	idelTaskIndex = 0;
 
 	//启动十个任务线程
-	for(int i=0; i<10; ++i)
+	for(int i=0; i<1; ++i)
 	{
 		TaskThread* p = new TaskThread();
 		threads.push_back(std::shared_ptr<TaskThread> (p));
@@ -66,24 +66,33 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	}
 
 	sockaddr_in addr;
-	if(IP == NULL)
-		sockUtil::setNetServerAddr(&addr, port);
+	if(IP == NULL) {
+		if(false == sockUtil::setNetServerAddr(&addr, port) ) {
+			Util::Log::log(Util::Log::ERROR, "set server Address error");
+		}
+	}
 	else 
-		sockUtil::setNetServerAddr(&addr, IP, port);
+	{
+		if(false == sockUtil::setNetServerAddr(&addr, IP, port) ) {
+			Util::Log::log(Util::Log::ERROR, "set server Address error");
+		}
+	}
 	sock_listen = sockUtil::listenToAddr(&addr, 10);
 	if(sock_listen == -1) 
 	{
 		Util::Log::log(Util::Log::ERROR, "server sock_listen listen to Address error");
 		return ;
 	}
+	//创建监听红黑树
+	epoll_root = epoll_create(10);
+
+	//设置连接监听事件
 	event_count = 1;
 	epoll_event event;
 	event.data.fd = sock_listen;
 	event.events = EPOLLIN;
-	epoll_root = epoll_create(10);
 	if(-1 == epoll_ctl(epoll_root, EPOLL_CTL_ADD, sock_listen,  &event) )
 	{
-	
 		event_count = 0;
 		Util::Log::log(Util::Log::ERROR, "epoll ctl error");
 		return ;
