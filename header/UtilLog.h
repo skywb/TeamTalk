@@ -13,7 +13,7 @@ namespace  Util {
 		virtual ~Log ();
 	
 		static Log* getIntences();
-		static pid_t InitLogThread(const char* logFilePath);
+		static pthread_t InitLogThread(const char* logFilePath);
 
 
 		enum RANK {
@@ -30,6 +30,8 @@ namespace  Util {
 
 		static void* LogThreadCallBack(void *);
 
+		void addLog(RANK rank, const std::string logMsg);
+		void writeInLogFile();
 	private:
 		Log (const char* logFilePath);
 
@@ -38,7 +40,6 @@ namespace  Util {
 		FILE* fp;
 		pthread_mutex_t log_mutex;
 		pthread_cond_t log_cond;
-		char m_LogTime[32];
 
 		std::vector<std::string> Info;
 		std::vector<std::string> Debug;

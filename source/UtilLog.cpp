@@ -54,7 +54,7 @@ Log* Log::getIntences() {
 
 }
 
-pid_t Log::InitLogThread(const char* logFilePath) {
+pthread_t Log::InitLogThread(const char* logFilePath) {
 	pthread_t pt;
 	init(logFilePath);
 	pthread_create(&pt, NULL, Log::LogThreadCallBack, (void*)getIntences());
@@ -62,115 +62,132 @@ pid_t Log::InitLogThread(const char* logFilePath) {
 	return pt;
 }
 
+void Log::writeInLogFile() {
+	pthread_mutex_lock(&log_mutex);
+	::timespec t;
+	::timeval now;
+	::gettimeofday(&now, nullptr);
+	t.tv_sec = now.tv_sec + 3;
+	t.tv_nsec = now.tv_usec * 1000;
+	pthread_cond_timedwait(&log_cond, &log_mutex,  &t);
+	std::cout << "writting..." << std::endl;
+
+	//可以优化为写时拷贝
+	for(auto& i : Error) 
+		fprintf(fp, "%s\n", i.c_str());
+	Error.clear();
+	::fflush(fp);
+
+	for(auto& i : Warning) 
+		fprintf(fp, "%s\n", i.c_str());
+	Warning.clear();
+
+	for(auto& i : Debug) 
+		fprintf(fp, "%s\n", i.c_str());
+	Debug.clear();
+
+	for(auto& i : Info) 
+		fprintf(fp, "%s\n", i.c_str());
+	Info.clear();
+
+	pthread_mutex_unlock(&(log_mutex));
+
+}
+
 
 void* Log::LogThreadCallBack(void *arg) {
-	Log& logObj = *((Log*)arg);
-
 	log(Log::INFO, "日志线程启动...");
-	while(true)
-	{
-		pthread_mutex_lock(&(logObj.log_mutex));
-		::timespec t;
-		::timeval now;
-		::gettimeofday(&now, nullptr);
-		t.tv_sec = now.tv_sec + 3;
-		t.tv_nsec = now.tv_usec * 1000;
-		pthread_cond_timedwait(&(logObj.log_cond), &(logObj.log_mutex),  &t);
-		//std::cout << "writting..." << std::endl;
-
-		//可以优化为写时拷贝
-		for(auto& i : logObj.Error) 
-			fprintf(logObj.fp, "%s\n", i.c_str());
-		logObj.Error.clear();
-
-		for(auto& i : logObj.Warning) 
-			fprintf(logObj.fp, "%s\n", i.c_str());
-		logObj.Warning.clear();
-
-		for(auto& i : logObj.Debug) 
-			fprintf(logObj.fp, "%s\n", i.c_str());
-		logObj.Debug.clear();
-
-		for(auto& i : logObj.Info) 
-			fprintf(logObj.fp, "%s\n", i.c_str());
-		logObj.Info.clear();
-
-		pthread_mutex_unlock(&(logObj.log_mutex));
-
+	while(true) {
+		((Log*)arg)->writeInLogFile();
 	}
 	return nullptr;
 
 }
 
+void Log::addLog(RANK rank, const std::string logMsg) {
 
-void Log::log(RANK rank, std::string& msg) {
-	Log* obj = getIntences();
-	time_t now = time(nullptr);
-	strftime(obj->m_LogTime, 32, "%Y-%m-%d %H:%M:%S : ", localtime(&now));
-	std::string s(obj->m_LogTime);
+	pthread_mutex_lock(&log_mutex);
 	switch (rank) {
 		case INFO:
-			s += "INFO : ";
-			s += msg;
-			obj->Info.push_back(s);
-			if(obj->Info.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
+			Info.push_back(logMsg);
+			if(Info.size() > 10) ::pthread_cond_signal(&log_cond);
 			break;
 		case DEBUG:
-			s += "DEBUG : ";
-			s += msg;
-			obj->Debug.push_back(s);
-			if(obj->Debug.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
+			Debug.push_back(logMsg);
+			if(Debug.size() > 10) ::pthread_cond_signal(&log_cond);
 			break;
 		case WARNING:
-			s += "WARNING : ";
-			s += msg;
-			obj->Warning.push_back(s);
-			if(obj->Warning.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
+			Warning.push_back(logMsg);
+			if(Warning.size() > 10) ::pthread_cond_signal(&log_cond);
 			break;
 		case ERROR:
-			s += "ERROR : ";
-			s += msg;
-			obj->Error.push_back(s);
-			pthread_cond_signal(&(obj->log_cond));
+			Error.push_back(logMsg);
+			pthread_cond_signal(&log_cond);
 			break;
 		default:
 			return ;
 	}
+	pthread_mutex_unlock(&log_mutex);
+}
+
+void Log::log(RANK rank, std::string& msg) {
+	char logTime[32];
+	time_t now = time(nullptr);
+	strftime(logTime, 32, "%Y-%m-%d %H:%M:%S : ", localtime(&now));
+	std::string s(logTime);
+	switch (rank) {
+		case INFO:
+			s += "INFO : ";
+			s += msg;
+			break;
+		case DEBUG:
+			s += "DEBUG : ";
+			s += msg;
+			break;
+		case WARNING:
+			s += "WARNING : ";
+			s += msg;
+			break;
+		case ERROR:
+			s += "ERROR : ";
+			s += msg;
+			break;
+		default:
+			return ;
+	}
+
+	Log* obj = getIntences();
+	obj->addLog(rank, s);
 
 }
 
 void Log::log(RANK rank, const char* msg) {
-	Log* obj = getIntences();
 	time_t now = time(nullptr);
-	strftime(obj->m_LogTime, 32, "%Y-%m-%d %H:%M:%S : ", localtime(&now));
-	std::string s(obj->m_LogTime);
+	char logTime[32];
+	strftime(logTime, 32, "%Y-%m-%d %H:%M:%S : ", localtime(&now));
+	std::string s(logTime);
 	switch (rank) {
 		case INFO:
 			s += "INFO : ";
 			s += msg;
-			obj->Info.push_back(s);
-			if(obj->Info.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
 			break;
 		case DEBUG:
 			s += "DEBUG : ";
 			s += msg;
-			obj->Debug.push_back(s);
-			if(obj->Debug.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
 			break;
 		case WARNING:
 			s += "WARNING : ";
 			s += msg;
-			obj->Warning.push_back(s);
-			if(obj->Warning.size() > 10) ::pthread_cond_signal(&(obj->log_cond));
 			break;
 		case ERROR:
 			s += "ERROR : ";
 			s += msg;
-			obj->Error.push_back(s);
-			pthread_cond_signal(&(obj->log_cond));
 			break;
 		default:
 			return ;
 	}
+
+	Log* obj = getIntences();
+	obj->addLog(rank, s);
 
 }
