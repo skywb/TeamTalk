@@ -114,13 +114,14 @@ namespace IM {
 	public:
 		//typedef  epoll_event Event;
 		typedef void* (*callBack) (void *);
-		TaskThread (callBack callBack_fun);
+		TaskThread ();
 		virtual ~TaskThread ();
 
 		std::shared_ptr<Task> getTask();
 		void addTask(std::shared_ptr<Task> task);
 
 		int getTaskCount() { return Tasks.size(); }
+		void join(callBack callBack_fun, void* arg);
 	
 	private:
 		pthread_t pid;
@@ -143,7 +144,7 @@ namespace IM {
 		}
 		void eventAdd(Event event);
 
-		TaskThread& getIdelThread();
+		std::shared_ptr<TaskThread> getIdelThread();
 
 
 		void loop();
@@ -165,7 +166,7 @@ namespace IM {
 		std::mutex que_mutex;
 
 		std::vector<epoll_event> events;
-		std::vector<TaskThread> threads;
+		std::vector<std::shared_ptr<TaskThread>> threads;
 		std::map<int, std::shared_ptr<Connecter>> sockToConn;
 
 		static IMReactor* _thisReactor;

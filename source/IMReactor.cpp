@@ -13,12 +13,15 @@ IMReactor* IMReactor::_thisReactor = nullptr;
 
 
 
-TaskThread::TaskThread (callBack callBack_fun) {/*{{{*/
+TaskThread::TaskThread () {/*{{{*/
 	pthread_mutex_init(&_mutex, NULL);
 	pthread_cond_init(&cond, NULL);
-	/* TODO: 移出构造函数 */
-	::pthread_create(&pid, NULL, callBack_fun, (void*)this);
 }/*}}}*/
+
+void TaskThread::join(callBack callBack_fun, void* arg) {
+
+	::pthread_create(&pid, NULL, callBack_fun, arg);
+}
 
 TaskThread::~TaskThread () {
 }
@@ -56,7 +59,11 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 
 	//启动十个任务线程
 	for(int i=0; i<10; ++i)
-		threads.push_back(TaskThread(IMTaskCallBack));
+	{
+		TaskThread* p = new TaskThread();
+		threads.push_back(std::shared_ptr<TaskThread> (p));
+		threads[i]->join(IMTaskCallBack, (void*)p);
+	}
 
 	sockaddr_in addr;
 	if(IP == NULL)
@@ -129,8 +136,8 @@ void IMReactor::loop() {/*{{{*/
 				//处理新连接
 				std::shared_ptr<Task> task = std::make_shared<NewConnectTask> (sockToConn[sock_listen]); 
 				//添加到一个线程任务中
-				TaskThread& taskThread = getIdelThread();
-				taskThread.addTask(task);
+				auto taskThread = getIdelThread();
+				taskThread->addTask(task);
 
 			} else {
 				if(cur.events == EPOLLIN) {
@@ -142,8 +149,8 @@ void IMReactor::loop() {/*{{{*/
 					 */
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<ReadableTask> (connecter);
-					TaskThread& taskThread = getIdelThread();
-					taskThread.addTask(task);
+					auto taskThread = getIdelThread();
+					taskThread->addTask(task);
 					
 				} else {
 					//可写
@@ -155,8 +162,8 @@ void IMReactor::loop() {/*{{{*/
 					 */
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<Task> (connecter);
-					TaskThread& taskThread = getIdelThread();
-					taskThread.addTask(task);
+					auto taskThread = getIdelThread();
+					taskThread->addTask(task);
 				}
 
 			}
@@ -179,7 +186,7 @@ void IMReactor::eventAdd(Event event) {
 	que.push(event);
 }
 
-TaskThread& IMReactor::getIdelThread() {
+std::shared_ptr<TaskThread> IMReactor::getIdelThread() {
 	if(idelTaskNum > 0) {
 		--idelTaskNum;
 		return threads[idelTaskIndex];
@@ -203,11 +210,11 @@ TaskThread& IMReactor::getIdelThread() {
 void* IM::IMTaskCallBack (void *arg) { /*{{{*/
 
 	if(arg == nullptr) return nullptr;
-	TaskThread& taskTread = *((TaskThread*)arg);
+	TaskThread* taskTread = (TaskThread*)arg;
 	Util::Log::log(Util::Log::INFO, "IMTask线程启动成功！");
 	while(true)
 	{
-		auto task = taskTread.getTask();
+		auto task = taskTread->getTask();
 		task->doit();
 	}
 
