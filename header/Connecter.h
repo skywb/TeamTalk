@@ -12,18 +12,22 @@
 
 namespace IM {
 
+	/*
+	 * 数据缓冲区， 可以暂存数据
+	 */
+
 	class Buffer
 	{
 	public:
-		Buffer () : buf(nullptr), _length(0) {}
+		Buffer () :  _begin(0), buf(nullptr), _end(0) {}
 		Buffer (const char* str) {
-			_length = strlen(str);
-			if(_length > MSGMAXSIZE) {
+			_end = strlen(str);
+			if(_end > MSGMAXSIZE) {
 				//log(error);
 				buf = nullptr;
 			} else {
 				buf = new char[MSGMAXSIZE];
-				::strncpy(buf, str, _length);
+				::strncpy(buf, str, _end);
 			}
 		}
 		virtual ~Buffer () {
@@ -31,18 +35,22 @@ namespace IM {
 		}
 
 		size_t getSize() {
-			return _length;
+			return _end - _begin;
 		}
 
-		bool addMsg(const char* msg);
-		const char* c_str() {
-			return buf;
-		}
+		//向后移动指针
+		void backPointer(size_t len);
+
+		//bool addMsg(const char* msg);
+		//const char* c_str() {
+		//	return buf;
+		//}
 	
 	private:
 		static const unsigned int MSGMAXSIZE = BUFSIZ;
+		size_t _begin;
 		char * buf;
-		size_t _length;
+		size_t _end;
 	};
 
 
@@ -51,14 +59,16 @@ namespace IM {
 	{
 	public:
 		Connecter(int sockfd) : _sockfd(sockfd), connected(true) {
-
 		}
+
 		virtual ~Connecter();
 
-		virtual bool send(char* msg);
-		virtual bool send();
-
+		virtual int send(char* msg);
 		virtual int recive(char* buf);
+
+		virtual void onWriteable();
+		virtual void onReadable();
+
 		virtual bool isConnected() {
 			std::lock_guard<std::mutex> lock(_mutex);
 			return connected; 
@@ -66,9 +76,19 @@ namespace IM {
 	
 	protected:
 		int _sockfd;
-		std::queue<Buffer> _bufque;
+		std::queue<Buffer> _readBuf;
+		std::queue<Buffer> _writeBuf;
 		std::mutex _mutex;
 		bool connected;
+	};
+
+	class TCPConnecter : public Connecter
+	{
+	public:
+		TCPConnecter(int sockfd) :Connecter(sockfd){ }
+
+		~TCPConnecter () {}
+	
 	};
 
 

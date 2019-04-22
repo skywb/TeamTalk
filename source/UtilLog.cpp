@@ -8,16 +8,18 @@
 
 using namespace Util;
 
-static Log* _LogInstance;
+static Log* _LogInstance = nullptr;
 
 void Log::init(const char* logFilePath) {
 	_LogInstance = new Log(logFilePath);
 }
 
 Log::Log (const char* logFilePath) {
-	::assert(_LogInstance == nullptr);
-	//if(_LogInstance != nullptr) 
-	//	std::cout << "_this != nullptr" << std::endl;
+	if(_LogInstance != nullptr) 
+	{
+		std::cout << "logfile != nullptr" << std::endl;
+		exit(-1);
+	}
 
 	pthread_mutex_init(&log_mutex, nullptr);
 	pthread_cond_init(&log_cond, nullptr);

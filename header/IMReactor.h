@@ -5,6 +5,7 @@
 #include <queue>
 #include <mutex>
 #include <vector>
+#include <map>
 #include <functional>
 #include <memory>
 #include <sys/epoll.h>
@@ -20,36 +21,31 @@ namespace IM {
 	 * IM事件
 	 */
 	class Event
-	{
+	{/*{{{*/
 	public:
 
-		enum EVENTS {
-			READABLE = 0x10,
-			WRITEABLE = 0x20
-		};
+		Event (EPOLL_EVENTS opt, EPOLL_EVENTS event, int fd) 
+			: fd(fd), opt(opt), event(event) { }
 
-		Event (EVENTS e) : event(e) { }
-
-		void setScok(int _fd) { fd = _fd; }
+		//void setScok(int _fd) { fd = _fd; }
 
 		int getScoket() { return fd; }
 
-		virtual EPOLL_EVENTS getEvent() {
-			switch (event) {
-				case READABLE:
-					return EPOLLIN;
-				case WRITEABLE:
-					return EPOLLOUT;
-			}
-			return EPOLLIN;
+		EPOLL_EVENTS getEvent() {
+			return event;
 		}	
+
+		//获取如何操作epoll
+		EPOLL_EVENTS getOpt() { return opt; }
+
 
 		virtual ~Event () {}
 	
 	protected:
 		int fd;
-		EVENTS event;
-	};
+		EPOLL_EVENTS opt;
+		EPOLL_EVENTS event;
+	};/*}}}*/
 
 
 	/*
@@ -59,14 +55,13 @@ namespace IM {
 	 */
 	class Task {
 	public:
-		Task(Event event, std::shared_ptr<Connecter> connecter_ptr) : 
-			m_eve(event), p_con(connecter_ptr) { }
+		Task(std::shared_ptr<Connecter> connecter_ptr) : 
+			p_con(connecter_ptr) { }
 
 		virtual void doit();
 
 		~Task() { }
 	protected:
-		Event m_eve;
 		std::shared_ptr<Connecter> p_con;
 	};
 
@@ -75,11 +70,34 @@ namespace IM {
 	class WriteableTask : public Task
 	{
 	public:
-		WriteableTask (Event event, std::shared_ptr<Connecter> connecter_ptr) : 
-			Task(event, connecter_ptr) { }
+		WriteableTask (std::shared_ptr<Connecter> connecter_ptr) : 
+			Task(connecter_ptr) { }
 
 		virtual ~WriteableTask () { }
 
+		void doit() override ;
+
+	};
+
+	class ReadableTask : public Task
+	{
+	public:
+		ReadableTask (std::shared_ptr<Connecter> connecter_ptr) : 
+			Task(connecter_ptr) { }
+
+		virtual ~ReadableTask () { }
+
+		void doit() override ;
+
+	};
+
+	class NewConnectTask : public Task
+	{
+	public:
+		NewConnectTask (std::shared_ptr<Connecter> connecter_ptr) : 
+			Task(connecter_ptr) { }
+
+		virtual ~NewConnectTask () { }
 
 		void doit() override ;
 
@@ -100,6 +118,9 @@ namespace IM {
 		virtual ~TaskThread ();
 
 		std::shared_ptr<Task> getTask();
+		void addTask(std::shared_ptr<Task> task);
+
+		int getTaskCount() { return Tasks.size(); }
 	
 	private:
 		pthread_t pid;
@@ -110,21 +131,31 @@ namespace IM {
 	};
 
 	class IMReactor
-	{
+	{/*{{{*/
 	public:
 		virtual ~IMReactor ();
 	
 		static IMReactor* getInstances();
-		static IMReactor* IMReactorInit(char* IP, uint16_t port);
-		static void addEventListen (Event event);
+		static IMReactor* IMReactorInit(const char* IP, uint16_t port);
+		static void optEventListen (Event event);
+		std::shared_ptr<Connecter> getConnecter(int sockfd) {
+			return sockToConn[sockfd];	
+		}
 		void eventAdd(Event event);
+
+		TaskThread& getIdelThread();
+
 
 		void loop();
 
 	private:
-		IMReactor (char* IP, uint16_t port);
+		IMReactor (const char* IP, uint16_t port);
 		int sock_listen;
 		int epoll_root;
+		
+		//当前空闲进程还能承载的任务数量
+		int idelTaskNum;
+		int idelTaskIndex;
 
 		size_t event_count;
 
@@ -135,9 +166,10 @@ namespace IM {
 
 		std::vector<epoll_event> events;
 		std::vector<TaskThread> threads;
+		std::map<int, std::shared_ptr<Connecter>> sockToConn;
 
 		static IMReactor* _thisReactor;
-	};
+	};/*}}}*/
 
 	void* IMTaskCallBack (void* arg);
 

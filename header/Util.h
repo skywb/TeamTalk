@@ -2,7 +2,6 @@
 #define UTIL_H_H8GDXEEW
 
 
-#include "Log.h"
 #include "MutexLock.h"
 
 namespace Util {
