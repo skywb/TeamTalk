@@ -24,7 +24,7 @@ namespace IM {
 	{/*{{{*/
 	public:
 
-		Event (EPOLL_EVENTS opt, EPOLL_EVENTS event, int fd) 
+		Event (int opt, EPOLL_EVENTS event, int fd) 
 			: fd(fd), opt(opt), event(event) { }
 
 		//void setScok(int _fd) { fd = _fd; }
@@ -36,14 +36,14 @@ namespace IM {
 		}	
 
 		//获取如何操作epoll
-		EPOLL_EVENTS getOpt() { return opt; }
+		int getOpt() { return opt; }
 
 
 		virtual ~Event () {}
 	
 	protected:
 		int fd;
-		EPOLL_EVENTS opt;
+		int opt;
 		EPOLL_EVENTS event;
 	};/*}}}*/
 
@@ -165,7 +165,7 @@ namespace IM {
 		std::queue<Event> que;
 		std::mutex que_mutex;
 
-		std::vector<epoll_event> events;
+		//std::vector<epoll_event> events;
 		std::vector<std::shared_ptr<TaskThread>> threads;
 		std::map<int, std::shared_ptr<Connecter>> sockToConn;
 

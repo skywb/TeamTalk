@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <cstring>
+#include <fcntl.h>
 
 
 #include "IMReactor.h"
@@ -58,7 +59,7 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	idelTaskIndex = 0;
 
 	//启动十个任务线程
-	for(int i=0; i<1; ++i)
+	for(int i=0; i<10; ++i)
 	{
 		TaskThread* p = new TaskThread();
 		threads.push_back(std::shared_ptr<TaskThread> (p));
@@ -90,6 +91,7 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	event_count = 1;
 	epoll_event event;
 	event.data.fd = sock_listen;
+	/* TODO: 改为ET模式 */
 	event.events = EPOLLIN;
 	if(-1 == epoll_ctl(epoll_root, EPOLL_CTL_ADD, sock_listen,  &event) )
 	{
@@ -97,6 +99,7 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 		Util::Log::log(Util::Log::ERROR, "epoll ctl error");
 		return ;
 	}
+	Util::Log::log(Util::Log::DEBUG, "epoll create");
 }/*}}}*/
 
 IMReactor::~IMReactor() {
@@ -116,39 +119,54 @@ IMReactor* IMReactor::IMReactorInit(const char* IP, uint16_t port) {
 }
 
 
+
 void IMReactor::loop() {/*{{{*/
+	Util::Log::log(Util::Log::DEBUG, "begin listen");
+	const int MAX_EVENTS = 100000;
+	epoll_event eventss[MAX_EVENTS];
 	while(true)
 	{
+		//std::cout << "add event" << std::endl;
 		{std::lock_guard<std::mutex> lock(que_mutex);
 			while(!que.empty()) {
 				auto& eve = que.front();
 				epoll_event event;
-				event.events = eve.getEvent();
+				//设置ET模式
+				event.events = eve.getEvent() | EPOLLET;
 				event.data.fd = eve.getScoket();
 				epoll_ctl(epoll_root, eve.getOpt(), eve.getScoket(), &event);
 				event_count++;
 				que.pop();
 			}
 		}
+		//std::cout << "begin" << std::endl;
 
-		int n = ::epoll_wait(epoll_root, &*events.begin(), static_cast<int>(events.size()), 0);
+		//int n = ::epoll_wait(epoll_root, &*events.begin(), static_cast<int>(events.size()), -1);
+		int n = ::epoll_wait(epoll_root, eventss, MAX_EVENTS, -1);
+		if(n == -1)
+			std::cout << strerror(errno) << std::endl;
 
 		//扩容
-		if(n > 0 && events.size() == static_cast<size_t>(n))
-			events.resize(n * 2);
+		//if(n > 0 && events.size() == static_cast<size_t>(n))
+		//	events.resize(n * 2);
 
+		std::cout << n << std::endl;
 		for(int i=0; i<n; ++i) {
-			auto& cur = events[i];
+			auto& cur = eventss[i];
 			if(cur.data.fd == sock_listen) {
 				//新连接
 				std::cout << "新的连接" << std::endl;
 				//处理新连接
-				std::shared_ptr<Task> task = std::make_shared<NewConnectTask> (sockToConn[sock_listen]); 
-				//添加到一个线程任务中
-				auto taskThread = getIdelThread();
-				taskThread->addTask(task);
+				//std::shared_ptr<Task> task = std::make_shared<NewConnectTask> (sockToConn[sock_listen]); 
+				////添加到一个线程任务中
+				//auto taskThread = getIdelThread();
+				//taskThread->addTask(task);
+				int nfd = sockUtil::acceptNewConnect(sock_listen);	
+				IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
 
-			} else {
+			} 
+			//std::cout << "not" << std::endl;
+			else {
 				if(cur.events == EPOLLIN) {
 					//可读 
 					/*
@@ -232,9 +250,12 @@ void* IM::IMTaskCallBack (void *arg) { /*{{{*/
 
 void Task::doit() {
 
+	std::cout << "task doing..." << std::endl;
 }
 
 void ReadableTask::doit() {
+
+	std::cout << "read task doing..." << std::endl;
 
 }
 
@@ -244,6 +265,7 @@ void WriteableTask::doit() {
 	 * 将缓冲区的数据写入套接字内
 	 */
 
+	std::cout << "write task doing..." << std::endl;
 }
 
 
@@ -255,7 +277,7 @@ void NewConnectTask::doit() {
 	 * 想监听队列中添加一个需要监听的事件
 	 * */
 
-
+	std::cout << "NewConnect task doing..." << std::endl;
 
 }
 
