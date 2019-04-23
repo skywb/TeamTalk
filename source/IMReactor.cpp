@@ -135,6 +135,7 @@ void IMReactor::loop() {/*{{{*/
 				event.events = eve.getEvent() | EPOLLET;
 				event.data.fd = eve.getScoket();
 				epoll_ctl(epoll_root, eve.getOpt(), eve.getScoket(), &event);
+				sockToConn[eve.getScoket()] = std::make_shared<Connecter> (eve.getScoket());
 				event_count++;
 				que.pop();
 			}
@@ -164,9 +165,7 @@ void IMReactor::loop() {/*{{{*/
 				int nfd = sockUtil::acceptNewConnect(sock_listen);	
 				IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
 
-			} 
-			//std::cout << "not" << std::endl;
-			else {
+			} else {
 				if(cur.events == EPOLLIN) {
 					//可读 
 					/*
@@ -255,8 +254,11 @@ void Task::doit() {
 
 void ReadableTask::doit() {
 
-	std::cout << "read task doing..." << std::endl;
-
+	char s[BUFSIZ];
+	int re = p_con->recive(s);
+	std::cout << "recive " << re << " betys" << std::endl;
+	std::cout << s << std::endl;
+	p_con->send(s);
 }
 
 void WriteableTask::doit() {

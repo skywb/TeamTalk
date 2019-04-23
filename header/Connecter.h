@@ -1,14 +1,16 @@
 #ifndef CONNECTER_H_TCUVAPLY
 #define CONNECTER_H_TCUVAPLY
 
-#include "Addresser.h"
-#include "sockUtil.h"
 #include <memory>
 #include <mutex>
 #include <memory>
 #include <cstring>
 #include <queue>
 #include <vector>
+#include <pthread.h>
+
+#include "Addresser.h"
+#include "sockUtil.h"
 
 namespace IM {
 
