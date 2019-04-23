@@ -5,7 +5,7 @@ D_BUILD := ./build
 #D_OBJ := $(D_BUILD)
 D_HEADER := ./header
 LIB := pthread
-CPPFLAGS := -Wall -I $(D_HEADER) -g
+CPPFLAGS := -Wall -I $(D_HEADER) -fstack-protector -fstack-protector-all -g 
 
 
 OBJ := IMReactor.o UtilLog.o sockUtil.o

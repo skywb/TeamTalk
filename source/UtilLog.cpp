@@ -70,7 +70,7 @@ void Log::writeInLogFile() {
 	t.tv_sec = now.tv_sec + 3;
 	t.tv_nsec = now.tv_usec * 1000;
 	pthread_cond_timedwait(&log_cond, &log_mutex,  &t);
-	std::cout << "writting..." << std::endl;
+	//std::cout << "writting..." << std::endl;
 
 	//可以优化为写时拷贝
 	for(auto& i : Error) 
