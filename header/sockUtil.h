@@ -25,6 +25,8 @@ namespace sockUtil {
 	bool setNetServerAddr(sockaddr_in* addr,const char*IP, const uint16_t port);
 	int setNetClientAddr(sockaddr_in* addr, const char* IP, const uint16_t port);
 
+	int acceptNewConnect(int fd);
+	int setNoBlock(int fd);
 }
 
 

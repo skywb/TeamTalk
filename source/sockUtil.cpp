@@ -1,7 +1,8 @@
-#include "sockUtil.h"
 #include <iostream>
 #include <sys/un.h>
+#include <fcntl.h>
 
+#include "sockUtil.h"
 
 int sockUtil::listenToAddr(const sockaddr_in* addr, const int num) {
 	int fd = socket(addr->sin_family, SOCK_STREAM, 0);
@@ -105,6 +106,25 @@ int sockUtil::setNetClientAddr(sockaddr_in* addr, const char* IP, const uint16_t
 	//addr->sin_addr.s_addr = htonl(IP);
 	addr->sin_addr.s_addr = inet_addr(IP);
 	return fd;
+}
+
+int acceptNewConnect(int fd) {
+	
+	//接受新的连接
+	//加入EPOLL监听树中
+	//ET模式
+	sockaddr_in addr;
+	socklen_t len;
+	len = sizeof(addr);
+	int nfd = accept(fd, (sockaddr*)&addr, &len);
+	return nfd;
+}
+
+int setNoBlock(int fd) {
+	int flags = ::fcntl(fd, F_GETFL);
+	::fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	return flags;
+
 }
 
 
