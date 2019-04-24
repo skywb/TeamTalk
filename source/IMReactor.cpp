@@ -140,18 +140,18 @@ void IMReactor::loop() {/*{{{*/
 				que.pop();
 			}
 		}
-		//std::cout << "begin" << std::endl;
-
+		
 		//int n = ::epoll_wait(epoll_root, &*events.begin(), static_cast<int>(events.size()), -1);
 		int n = ::epoll_wait(epoll_root, eventss, MAX_EVENTS, -1);
+		std::cout << "epoll n " << n << std::endl;
 		if(n == -1)
-			std::cout << strerror(errno) << std::endl;
+			std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 
 		//扩容
 		//if(n > 0 && events.size() == static_cast<size_t>(n))
 		//	events.resize(n * 2);
 
-		std::cout << n << std::endl;
+		//std::cout << n << std::endl;
 		for(int i=0; i<n; ++i) {
 			auto& cur = eventss[i];
 			if(cur.data.fd == sock_listen) {
@@ -162,6 +162,11 @@ void IMReactor::loop() {/*{{{*/
 				////添加到一个线程任务中
 				//auto taskThread = getIdelThread();
 				//taskThread->addTask(task);
+
+				
+				/* TODO: 
+				 * 此处代码应该拿到线程中去做
+				 * <24-04-19, sky> */
 				int nfd = sockUtil::acceptNewConnect(sock_listen);	
 				IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
 
@@ -173,6 +178,7 @@ void IMReactor::loop() {/*{{{*/
 					 * 创建Task
 					 * 分配工作线程
 					 */
+					std::cout << "新消息" << std::endl;
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<ReadableTask> (connecter);
 					auto taskThread = getIdelThread();
@@ -254,11 +260,25 @@ void Task::doit() {
 
 void ReadableTask::doit() {
 
-	char s[BUFSIZ];
-	int re = p_con->recive(s);
-	std::cout << "recive " << re << " betys" << std::endl;
-	std::cout << s << std::endl;
-	p_con->send(s);
+	while(true) {
+		char s[BUFSIZ];
+		int re = p_con->recive(s, 5);
+		if(re == 0) return;
+		std::cout << "recive " << re << " betys : " << s << std::endl;
+		p_con->send(s);
+	}
+
+
+	/* TODO: 
+	 * 
+	 * 1. 读取最少一个协议头
+	 * 2. 读取消息
+	 * 3. 判断是否还有未读信息， 有则循环
+	 * 4. 执行对应的处理函数
+	 * 5. 若不足一个协议头则返回nullprt  跳过
+	 * <24-04-19, sky> */
+
+
 }
 
 void WriteableTask::doit() {

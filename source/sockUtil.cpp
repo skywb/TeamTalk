@@ -10,7 +10,7 @@ int sockUtil::listenToAddr(const sockaddr_in* addr, const int num) {
 		close(fd);
 		//Log("bind error to addr");
 		std::cout << "bind error to addr" << std::endl;
-		std::cout << strerror(errno) << std::endl;
+		std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
 	if(listen(fd, num) == -1) {
@@ -29,14 +29,14 @@ int sockUtil::listenToAddr(const sockaddr_un* addr, const int num) {
 		close(fd);
 		//Log("bind error to addr");
 		std::cout << "bind error to addr" << std::endl;
-		std::cout << strerror(errno) << std::endl;
+		std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
 	if(listen(fd, num) == -1) {
 		close(fd);
 		//Log("listen error");
 		std::cout << "listen error" << std::endl;
-		std::cout << strerror(errno) << std::endl;
+		std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
 
@@ -49,7 +49,7 @@ int sockUtil::connectToAddr(const sockaddr_in* addr) {
 		close(fd);
 		//Log("connect error");
 		std::cout << "connect error" << std::endl;
-		std::cout << strerror(errno) << std::endl;
+		std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
 	return fd;
@@ -61,7 +61,7 @@ int sockUtil::connectToAddr(const sockaddr_un* addr) {
 		close(fd);
 		//Log("connect error");
 		std::cout << "connect error" << std::endl;
-		std::cout << strerror(errno) << std::endl;
+		std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 		return -1;
 	}
 	return fd;
@@ -108,7 +108,7 @@ int sockUtil::setNetClientAddr(sockaddr_in* addr, const char* IP, const uint16_t
 	return fd;
 }
 
-int acceptNewConnect(int fd) {
+int sockUtil::acceptNewConnect(int fd) {
 	
 	//接受新的连接
 	//加入EPOLL监听树中
@@ -120,7 +120,7 @@ int acceptNewConnect(int fd) {
 	return nfd;
 }
 
-int setNoBlock(int fd) {
+int sockUtil::setNoBlock(int fd) {
 	int flags = ::fcntl(fd, F_GETFL);
 	::fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	return flags;
