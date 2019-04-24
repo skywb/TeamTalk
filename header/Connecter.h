@@ -32,7 +32,7 @@ namespace IM {
 				::strncpy(buf, str, _end);
 			}
 		}
-		virtual ~Buffer () {
+		~Buffer () {
 			delete[] buf;
 		}
 
@@ -40,16 +40,15 @@ namespace IM {
 			return _end - _begin;
 		}
 
+		const char* getMsg() {
+			return buf;
+		}
+
 		//向后移动指针
 		void backPointer(size_t len);
 
-		//bool addMsg(const char* msg);
-		//const char* c_str() {
-		//	return buf;
-		//}
-	
 	private:
-		static const unsigned int MSGMAXSIZE = BUFSIZ;
+		static const unsigned int MSGMAXSIZE = BUFSIZ * 2;
 		size_t _begin;
 		char * buf;
 		size_t _end;
@@ -60,39 +59,37 @@ namespace IM {
 	class Connecter
 	{
 	public:
-		Connecter(int sockfd) : _sockfd(sockfd), connected(true) {
+		Connecter(int _sockfd) : 
+			sockfd(_sockfd), connected(true),
+			readBufend(0), writeBufHaveData(false)
+		{
+			::pthread_mutex_init(&mutex, nullptr);
 		}
 
 		virtual ~Connecter();
 
+		virtual int recive(char* buf, size_t minLength = 0, size_t maxLength = BUFSIZ);
 		virtual int send(char* msg);
-		virtual int recive(char* buf);
 
-		virtual void onWriteable();
-		virtual void onReadable();
+		//可写回调函数， 若所有数据都写完则返回true， 反之返回false
+		virtual bool onWriteable();
 
 		virtual bool isConnected() {
-			std::lock_guard<std::mutex> lock(_mutex);
-			return connected; 
+			::pthread_mutex_lock(&mutex);
+			bool stat = connected;
+			::pthread_mutex_unlock(&mutex);
+			return stat; 
 		}
 	
 	protected:
-		int _sockfd;
-		std::queue<Buffer> _readBuf;
-		std::queue<Buffer> _writeBuf;
-		std::mutex _mutex;
+		int sockfd;
 		bool connected;
+		size_t readBufend;
+		bool writeBufHaveData;
+		char readBuf[BUFSIZ*2];
+		std::queue<Buffer> writeBuf;
+		::pthread_mutex_t mutex;
 	};
-
-	class TCPConnecter : public Connecter
-	{
-	public:
-		TCPConnecter(int sockfd) :Connecter(sockfd){ }
-
-		~TCPConnecter () {}
-	
-	};
-
 
 }
 
