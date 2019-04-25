@@ -143,7 +143,7 @@ void IMReactor::loop() {/*{{{*/
 		
 		//int n = ::epoll_wait(epoll_root, &*events.begin(), static_cast<int>(events.size()), -1);
 		int n = ::epoll_wait(epoll_root, eventss, MAX_EVENTS, -1);
-		std::cout << "epoll n " << n << std::endl;
+		//std::cout << "epoll n " << n << std::endl;
 		if(n == -1)
 			std::cout << strerror(errno) << " : " << __FILE__ << " : " << __LINE__ << std::endl;
 
@@ -178,7 +178,6 @@ void IMReactor::loop() {/*{{{*/
 					 * 创建Task
 					 * 分配工作线程
 					 */
-					std::cout << "新消息" << std::endl;
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<ReadableTask> (connecter);
 					auto taskThread = getIdelThread();
@@ -262,9 +261,10 @@ void ReadableTask::doit() {
 
 	while(true) {
 		char s[BUFSIZ];
-		int re = p_con->recive(s, 5);
+		int re = p_con->recive(s, 10);
 		if(re == 0) return;
 		std::cout << "recive " << re << " betys : " << s << std::endl;
+		p_con->send("msg from server:");
 		p_con->send(s);
 	}
 
