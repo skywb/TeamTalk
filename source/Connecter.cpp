@@ -48,6 +48,10 @@ int Connecter::recive(char* buf, size_t minLength, size_t maxLength) {
 	}
 
 	int re = ::read(sockfd, readBuf+readBufend, minLength);
+	if(re == 0) 
+	{
+		std::cout << "断开连接" << std::endl;
+	}
 	if(re == -1) {
 		//没有信息可以读
 		if(errno == EAGAIN)
@@ -81,7 +85,7 @@ int Connecter::recive(char* buf, size_t minLength, size_t maxLength) {
 
 
 
-int Connecter::send(char* msg) {
+int Connecter::send(const char* msg) {
 	::pthread_mutex_lock(&mutex);
 	int re = 0;
 
@@ -99,6 +103,14 @@ int Connecter::send(char* msg) {
 
 	pthread_mutex_unlock(&mutex);
 	return re;
+}
+
+void Connecter::closeThisConnecter() {
+	::pthread_mutex_lock(&mutex);
+	connected = false;
+	IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLIN, sockfd));
+	IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLOUT, sockfd));
+	::pthread_mutex_unlock(&mutex);
 }
 
 

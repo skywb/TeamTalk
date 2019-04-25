@@ -69,7 +69,8 @@ namespace IM {
 		virtual ~Connecter();
 
 		virtual int recive(char* buf, size_t minLength = 0, size_t maxLength = BUFSIZ);
-		virtual int send(char* msg);
+		virtual int send(const char* msg);
+		virtual void closeThisConnecter();
 
 		//可写回调函数， 若所有数据都写完则返回true， 反之返回false
 		virtual bool onWriteable();
