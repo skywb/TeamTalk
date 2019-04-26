@@ -60,15 +60,32 @@ namespace IM {
 	{
 	public:
 		Connecter(int _sockfd) : 
-			sockfd(_sockfd), connected(true),
-			readBufend(0), writeBufHaveData(false)
+			sockfd(_sockfd), connected(true), readBufbeg(0),
+			readBufend(0), writeBufHaveData(false), readBufMaxLenth(BUFSIZ*2)
 		{
+			readBuf = (char*)::malloc(BUFSIZ*2);
 			::pthread_mutex_init(&mutex, nullptr);
 		}
 
-		virtual ~Connecter();
+		virtual ~Connecter() {
+			::free(readBuf);
+			::close(sockfd);
+		}
 
-		virtual int recive(char* buf, size_t minLength = 0, size_t maxLength = BUFSIZ);
+		//读取数据
+		virtual int recive(char* buf, size_t minLength = 0);
+		/*
+		 * 尝试读取
+		 * 若数据不符合要求，通过rollback_tryRecive()使数据回到缓冲区，变为未读状态
+		 * 若符合要求，调用commit_tryRecive()提交已读取内容
+		 */
+		virtual bool startTryRecive(size_t minLength = 0, size_t maxLength = BUFSIZ);
+		virtual int tryRecive(char* buf, size_t length = 0);
+		//确认读取内容
+		virtual bool commit_tryRecive();
+		//回滚数据，使tryRecive读取的数据回到缓冲区中
+		virtual bool rollback_tryRecive();
+		//发送数据
 		virtual int send(const char* msg);
 		virtual void closeThisConnecter();
 
@@ -85,9 +102,11 @@ namespace IM {
 	protected:
 		int sockfd;
 		bool connected;
+		size_t readBufbeg;
 		size_t readBufend;
 		bool writeBufHaveData;
-		char readBuf[BUFSIZ*2];
+		size_t readBufMaxLenth;
+		char* readBuf;
 		std::queue<Buffer> writeBuf;
 		::pthread_mutex_t mutex;
 	};

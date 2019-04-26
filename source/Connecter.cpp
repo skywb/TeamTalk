@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/ip.h>
+#include <exception>
 
 #include "Connecter.h"
 #include "IMReactor.h"
@@ -17,39 +18,39 @@ void Buffer::backPointer(size_t len) {
 }
 
 
-Connecter::~Connecter() {
-	close(sockfd);
-}
 
-
-int Connecter::recive(char* buf, size_t minLength, size_t maxLength) {
+int Connecter::recive(char* buf, size_t length) {
 
 	::pthread_mutex_lock(&mutex);
 
+	////若readBufbeg不为0 则之前调用了tryRecive未commit或未rollback
+	//assert(readBufbeg == 0);
+
 	/* NOTE:
-	 * 如果minLength大于BUFSIZ, 并且maxLength大于minLength
+	 * 如果length大于BUFSIZ, 并且maxLength大于length
 	 * 此时应该可以直接读到buf中
 	 * 这部分尚未写
 	 * */
 
-	if(minLength > BUFSIZ)
+	if(length > BUFSIZ)
 	{
 		pthread_mutex_unlock(&mutex);
 		return -1;
 	}
 
 	//缓冲区内的数据足够
-	if(readBufend >= minLength) {
-		::strncpy(buf, readBuf, minLength);
-		::strncpy(readBuf, readBuf+minLength, readBufend-minLength);
-		readBufend -= minLength;
+	if(readBufend >= length) {
+		::strncpy(buf, readBuf, length);
+		::strncpy(readBuf, readBuf+length, readBufend-length);
+		readBufend -= length;
 		pthread_mutex_unlock(&mutex);
-		return minLength;
+		return length;
 	}
 
-	int re = ::read(sockfd, readBuf+readBufend, minLength);
+	int re = ::read(sockfd, readBuf+readBufend, length);
 	if(re == 0) 
 	{
+		/* TODO:  <26-04-19, yourname> */
 		std::cout << "断开连接" << std::endl;
 	}
 	if(re == -1) {
@@ -66,13 +67,13 @@ int Connecter::recive(char* buf, size_t minLength, size_t maxLength) {
 		readBufend += re;
 	}
 
-	//缓冲区数据加上读到的数据足够minLength
-	if(readBufend >= minLength) {
-		::strncpy(buf, readBuf, minLength);
-		::strncpy(readBuf, readBuf+minLength, readBufend-minLength);
-		readBufend -= minLength;
+	//缓冲区数据加上读到的数据足够length
+	if(readBufend >= length) {
+		::strncpy(buf, readBuf, length);
+		::strncpy(readBuf, readBuf+length, readBufend-length);
+		readBufend -= length;
 		pthread_mutex_unlock(&mutex);
-		return minLength;
+		return length;
 	}
 
 	pthread_mutex_unlock(&mutex);
@@ -81,8 +82,73 @@ int Connecter::recive(char* buf, size_t minLength, size_t maxLength) {
 
 }
 
+bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
+	::pthread_mutex_lock(&mutex);
+
+	if(maxLength >= readBufMaxLenth) {
+		if(nullptr == ::realloc(readBuf, maxLength+10)) {
+			char msg[200];
+			::sprintf(msg, "realloc failed in tryRecive: maxLength = %d", static_cast<int>(maxLength));
+			
+			Util::Log::log(Util::Log::WARNING, msg);
+			return false;
+		}
+		readBufbeg = maxLength + 10;
+	}
+	return true;
+}
+
+int Connecter::tryRecive(char* buf, size_t length) {
+
+	if(readBufend - readBufbeg >= length) {
+		::strncpy(buf, readBuf+readBufbeg, length);
+		readBufbeg += length;
+		return length;
+	}
+
+	int re = ::read(sockfd, readBuf+readBufend, length);
+	if(re == 0) 
+	{
+		/* TODO:  <26-04-19, yourname> */
+		std::cout << "断开连接" << std::endl;
+	}
+	if(re == -1) {
+		//没有信息可以读
+		if(errno == EAGAIN)
+		{
+			return 0;
+		} else {
+			Util::Log::log(Util::Log::ERROR, "read error in Connecter recive");
+		}
+
+	} else {
+		readBufend += re;
+	}
+
+	//缓冲区数据加上读到的数据足够length
+	if(readBufend-readBufbeg >= length) {
+		::strncpy(buf, readBuf+readBufbeg, length);
+		readBufbeg += length;
+		return length;
+	}
+	return 0;
+}
 
 
+bool Connecter::commit_tryRecive() {
+
+	size_t len = readBufend - readBufbeg;
+	::strncpy(readBuf, readBuf+readBufbeg, len);
+	readBufend -= len;
+	readBufbeg = 0;
+	::pthread_mutex_unlock(&mutex);
+	return true;
+}
+bool Connecter::rollback_tryRecive() {
+	readBufbeg = 0;
+	::pthread_mutex_unlock(&mutex);
+	return true;
+}
 
 
 int Connecter::send(const char* msg) {
