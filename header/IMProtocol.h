@@ -9,6 +9,7 @@
 
 #include "cmd.h"
 #include "UtilPdu.h"
+#include "Connecter.h"
 namespace IM {
 
 class IMPduHeader {
@@ -18,14 +19,22 @@ public:
 	typedef uint32_t BodyLength;
 	typedef uint16_t CMD;
 
-	IMPduHeader () :  objUserId(0), bodyLength(0), command(0) {}
+	IMPduHeader () : headerLength(0), objUserId(0), bodyLength(0), command(INVALID) {}
+	IMPduHeader (const char* buf, size_t len);
 
-	static IMPduHeader* makeHeader() {
+	/*
+	 * 读取一个协议头
+	 * 调用此函数之前必须保证connecter是一个已经开始了事务的连接
+	 * 即 已经调用了start_tryRecive方法
+	 */
+	static IMPduHeader* makeHeader(std::shared_ptr<Connecter> connecter_ptr);
 
-		/* TODO: 
-		 * 读取一个协议头
-		 * <25-04-19, sky> */
-
+	size_t getHeaderLenth() {
+		return headerLength;
+	}
+	
+	void setHeaderLength(size_t len) {
+		headerLength = len;
 	}
 
 	UserId getUserId () {
@@ -60,22 +69,10 @@ public:
 		command = cmd;
 	}
 
-	const char* getHeader (char* buf) {
-		char* p = buf;
-		::memcpy(p, &HEADER_BEGIN, sizeof(HEADER_BEGIN));
-		p += sizeof(HEADER_BEGIN);
-		::memcpy(p, &userId, sizeof(UserId));
-		p += sizeof(UserId);
-		::memcpy(p, &objUserId, sizeof(UserId));
-		p += sizeof(UserId);
-		::memcpy(p, &bodyLength, sizeof(BodyLength));
-		p += sizeof(BodyLength);
-		::memcpy(p, &command, sizeof(CMD));
-		return buf;
-	}
+	const char* getHeader (char* buf); 
 
-	static uint32_t getHeaderLenth () {
-		return HEADER_LENGTH;
+	static uint32_t getHeaderMaxLenth () {
+		return HEADER_MAX_LENGTH;
 	}
 
 
@@ -86,6 +83,7 @@ public:
 
 private:
 	//用户ID
+	size_t headerLength;
 	UserId userId;
 	//好友ID, 若非发送消息， 则为空
 	UserId objUserId;
@@ -95,18 +93,19 @@ private:
 	CMD command;
 
 	static const uint8_t HEADER_BEGIN = 0xff;
-	static const uint32_t HEADER_LENGTH = sizeof(HEADER_BEGIN) + sizeof(UserId) + sizeof(UserId) + sizeof(BodyLength) + sizeof(CMD);
+	static const uint32_t HEADER_MAX_LENGTH = sizeof(HEADER_BEGIN) + sizeof(UserId) + sizeof(UserId) + sizeof(BodyLength) + sizeof(CMD);
 	static const size_t BODY_MAX_LENGTH = 2048;
 
 public:
 	//未登录命令
-	static const uint16_t LOGIN = 0x1ff;
+	static const CMD LOGIN = 0x1ff;
+	static const CMD LOGOUT = 0x2ff;
 
 	//在线命令
-	static const uint16_t SENDMSG = 0xf1f;
+	static const CMD SENDMSG = 0xf1f;
 
 	//其他命令
-	static const uint16_t INVALID = 0xff1;
+	static const CMD INVALID = 0xff1;
 };
 
 
