@@ -8,7 +8,7 @@ LIB := pthread
 CPPFLAGS := -Wall -I $(D_HEADER) #-fstack-protector -fstack-protector-all -g 
 
 
-OBJ := IMReactor.o UtilLog.o sockUtil.o Connecter.o
+OBJ := IMReactor.o Log.o sockUtil.o Connecter.o
 
 P_OBJ := $(addprefix $(D_BUILD)/, $(OBJ))
 
@@ -23,8 +23,8 @@ $(D_BUILD)/IMReactor.o : IMReactor.cpp IMReactor.h
 $(D_BUILD)/Connecter.o : Connecter.cpp Connecter.h
 	g++ -c $(CPPFLAGS) -o $(D_BUILD)/Connecter.o $(D_SRC)/Connecter.cpp
 
-$(D_BUILD)/UtilLog.o : UtilLog.cpp UtilLog.h
-	g++ -c $(CPPFLAGS) -o $(D_BUILD)/UtilLog.o $(D_SRC)/UtilLog.cpp
+$(D_BUILD)/Log.o : Log.cpp Log.h
+	g++ -c $(CPPFLAGS) -o $(D_BUILD)/Log.o $(D_SRC)/Log.cpp
 
 
 $(D_BUILD)/sockUtil.o : sockUtil.cpp sockUtil.h
