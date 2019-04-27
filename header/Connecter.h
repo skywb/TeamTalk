@@ -14,8 +14,7 @@
 
 namespace IM {
 
-	/*
-	 * 数据缓冲区， 可以暂存数据
+	/* 数据缓冲区， 可以暂存数据
 	 */
 
 	class Buffer
@@ -54,13 +53,26 @@ namespace IM {
 		size_t _end;
 	};
 
+	class TryReciveException : public std::exception
+	{
+	public:
+		TryReciveException (const char* msg) :msg(msg) {}
+		virtual ~TryReciveException () {}
+
+		const char* what() const throw() {
+			return msg;
+		}
+	
+	private:
+		const char* msg;
+	};
 
 
 	class Connecter
 	{
 	public:
 		Connecter(int _sockfd) : 
-			sockfd(_sockfd), connected(true), readBufbeg(0),
+			sockfd(_sockfd), connected(true), TryReciving(false), readBufbeg(0),
 			readBufend(0), writeBufHaveData(false), readBufMaxLenth(BUFSIZ*2)
 		{
 			readBuf = (char*)::malloc(BUFSIZ*2);
@@ -74,8 +86,8 @@ namespace IM {
 
 		//读取数据
 		virtual int recive(char* buf, size_t minLength = 0);
-		/*
-		 * 尝试读取
+
+		/* 尝试读取
 		 * 若数据不符合要求，通过rollback_tryRecive()使数据回到缓冲区，变为未读状态
 		 * 若符合要求，调用commit_tryRecive()提交已读取内容
 		 */
@@ -100,14 +112,29 @@ namespace IM {
 		}
 	
 	protected:
+		//正在连接的socket
 		int sockfd;
+		//是否是一个可用的连接
 		bool connected;
+
+		//是否已经startRevive
+		bool TryReciving;
+
+		/* 读缓冲的开始位置，一般为0
+		 * 当开始了tryRecive之后才会变动
+		 */
 		size_t readBufbeg;
+		// 缓冲结束位置
 		size_t readBufend;
+		//写缓冲中是否有数据
 		bool writeBufHaveData;
+		//读缓冲最大容量
 		size_t readBufMaxLenth;
+		//读缓冲
 		char* readBuf;
+		//写缓冲
 		std::queue<Buffer> writeBuf;
+		//锁
 		::pthread_mutex_t mutex;
 	};
 

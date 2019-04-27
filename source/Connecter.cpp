@@ -5,7 +5,7 @@
 
 #include "Connecter.h"
 #include "IMReactor.h"
-#include "UtilLog.h"
+#include "UtilUtil::Log.h"
 
 
 using namespace IM;
@@ -85,6 +85,10 @@ int Connecter::recive(char* buf, size_t length) {
 bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
 	::pthread_mutex_lock(&mutex);
 
+	if(TryReciving == true) {
+		throw TryReciveException("TryReciving has started");
+	}
+	TryReciving = true;
 	if(maxLength >= readBufMaxLenth) {
 		if(nullptr == ::realloc(readBuf, maxLength+10)) {
 			char msg[200];
@@ -99,6 +103,10 @@ bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
 }
 
 int Connecter::tryRecive(char* buf, size_t length) {
+
+	if(TryReciving == false) {
+		throw TryReciveException("TryReciving has not started");
+	}
 
 	if(readBufend - readBufbeg >= length) {
 		::strncpy(buf, readBuf+readBufbeg, length);
@@ -137,6 +145,9 @@ int Connecter::tryRecive(char* buf, size_t length) {
 
 bool Connecter::commit_tryRecive() {
 
+	if(TryReciving == false) {
+		throw TryReciveException("TryReciving has not started");
+	}
 	size_t len = readBufend - readBufbeg;
 	::strncpy(readBuf, readBuf+readBufbeg, len);
 	readBufend -= len;
@@ -145,6 +156,9 @@ bool Connecter::commit_tryRecive() {
 	return true;
 }
 bool Connecter::rollback_tryRecive() {
+	if(TryReciving == false) {
+		throw TryReciveException("TryReciving has not started");
+	}
 	readBufbeg = 0;
 	::pthread_mutex_unlock(&mutex);
 	return true;

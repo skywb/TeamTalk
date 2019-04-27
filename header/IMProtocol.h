@@ -10,6 +10,7 @@
 #include "cmd.h"
 #include "UtilPdu.h"
 #include "Connecter.h"
+
 namespace IM {
 
 class IMPduHeader {
@@ -22,8 +23,7 @@ public:
 	IMPduHeader () : headerLength(0), objUserId(0), bodyLength(0), command(INVALID) {}
 	IMPduHeader (const char* buf, size_t len);
 
-	/*
-	 * 读取一个协议头
+	/* 读取一个协议头
 	 * 调用此函数之前必须保证connecter是一个已经开始了事务的连接
 	 * 即 已经调用了start_tryRecive方法
 	 */

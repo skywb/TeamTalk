@@ -1,6 +1,10 @@
+#include <cstring>
+
 #include "IMProtocol.h"
 #include "UtilPdu.h"
-#include <cstring>
+#include "UtilUtil::Log.h"
+
+
 
 using namespace IM;
 
@@ -59,9 +63,7 @@ using namespace IM;
 
 
 IMPduHeader::IMPduHeader(const char* buf, size_t len) {
-	/* 
-	 * 读取根据buf内容，读取协议头信息
-	 *
+	/* * 读取根据buf内容，读取协议头信息
 	 * <26-04-19, yourname> */
 	headerLength = 0;
 	userId = 0;
@@ -101,23 +103,29 @@ IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 
 IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 	char buf[getHeaderMaxLenth()];
-	size_t re = connecter_ptr->tryRecive(buf, sizeof(HEADER_BEGIN));
-	if(re == 0 || 
-		sizeof(HEADER_BEGIN) != 
-		::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
-	{
+	size_t len = 0;
+	try {
+		size_t re = connecter_ptr->tryRecive(buf, sizeof(HEADER_BEGIN));
+		if(re == 0 || 
+				sizeof(HEADER_BEGIN) != 
+				::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
+		{
 
-		connecter_ptr->rollback_tryRecive();
-		return nullptr;
-	}
-	if(0 == connecter_ptr->tryRecive(buf, sizeof(size_t))) {
-		connecter_ptr->rollback_tryRecive();
-		return nullptr;
-	}
-	size_t len = *(size_t*)buf;
-	if(0 == connecter_ptr->tryRecive(buf, len)) {
-		connecter_ptr->rollback_tryRecive();
-		return nullptr;
+			return nullptr;
+		}
+		if(0 == connecter_ptr->tryRecive(buf, sizeof(size_t))) {
+			return nullptr;
+		}
+		len = *(size_t*)buf;
+		if(0 == connecter_ptr->tryRecive(buf, len)) {
+			return nullptr;
+		}
+	
+	}catch(TryReciveException &e) {
+		char msg[BUFSIZ];
+		sprintf(msg, "file %s : line %d: %s", __FILE__, __LINE__, e.what());
+		Util::Log::log(Util::Log::ERROR, msg);
+		throw;
 	}
 	IMPduHeader* header = new IMPduHeader(buf, len);
 	if(IMPduHeader::INVALID == header->getCommand()) 
@@ -131,17 +139,35 @@ IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 
 
 const char* IMPduHeader::getHeader (char* buf) {
-		char* p = buf;
-		::memcpy(p, &HEADER_BEGIN, sizeof(HEADER_BEGIN));
-		p += sizeof(HEADER_BEGIN);
-		::memcpy(p, &userId, sizeof(UserId));
-		p += sizeof(UserId);
-		::memcpy(p, &objUserId, sizeof(UserId));
-		p += sizeof(UserId);
-		::memcpy(p, &bodyLength, sizeof(BodyLength));
-		p += sizeof(BodyLength);
-		::memcpy(p, &command, sizeof(CMD));
-		return buf;
+	char* p = buf;
+	size_t cur = 0;
+	
+	cur += sizeof(CMD);
+	switch (command) {
+		case LOGIN:
+			userId = *(UserId*)(buf+cur);
+			cur += sizeof(UserId);
+			bodyLength = *(BodyLength*)(buf+cur);
+			cur += sizeof(bodyLength);
+			break;
+		case LOGOUT:
+			userId = *(UserId*)(buf+cur);
+			cur += sizeof(UserId);
+			break;
+		case SENDMSG:
+			userId = *(UserId*)(buf+cur);
+			cur += sizeof(UserId);
+			objUserId = *(UserId*)(buf+cur);
+			cur += sizeof(UserId);
+			bodyLength = *(BodyLength*)(buf+cur);
+			cur += sizeof(bodyLength);
+			break;
+		default:
+			command = INVALID;
+			break;
+	}
+	if(cur != len) 
+		command = INVALID;
 }
 
 
