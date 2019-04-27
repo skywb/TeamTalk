@@ -6,12 +6,11 @@
 
 
 #include "Util.h"
-namespace  Util {
-	class Log
-	{
+class Log
+{
 	public:
 		virtual ~Log ();
-	
+
 		static Log* getIntences();
 		static pthread_t InitLogThread(const char* logFilePath);
 
@@ -36,7 +35,7 @@ namespace  Util {
 		Log (const char* logFilePath);
 
 		static void init(const char* logFilePath);
-		
+
 		FILE* fp;
 		pthread_mutex_t log_mutex;
 		pthread_cond_t log_cond;
@@ -45,8 +44,6 @@ namespace  Util {
 		std::vector<std::string> Debug;
 		std::vector<std::string> Warning;
 		std::vector<std::string> Error;
-	};
+};
 
 
-
-}

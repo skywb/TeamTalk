@@ -4,7 +4,7 @@
 
 
 #include "IMReactor.h"
-#include "UtilLog.h"
+#include "Log.h"
 
 
 using namespace IM;
@@ -69,19 +69,19 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	sockaddr_in addr;
 	if(IP == NULL) {
 		if(false == sockUtil::setNetServerAddr(&addr, port) ) {
-			Util::Log::log(Util::Log::ERROR, "set server Address error");
+			Log::log(Log::ERROR, "set server Address error");
 		}
 	}
 	else 
 	{
 		if(false == sockUtil::setNetServerAddr(&addr, IP, port) ) {
-			Util::Log::log(Util::Log::ERROR, "set server Address error");
+			Log::log(Log::ERROR, "set server Address error");
 		}
 	}
 	sock_listen = sockUtil::listenToAddr(&addr, 10);
 	if(sock_listen == -1) 
 	{
-		Util::Log::log(Util::Log::ERROR, "server sock_listen listen to Address error");
+		Log::log(Log::ERROR, "server sock_listen listen to Address error");
 		return ;
 	}
 	//创建监听红黑树
@@ -96,10 +96,10 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	if(-1 == epoll_ctl(epoll_root, EPOLL_CTL_ADD, sock_listen,  &event) )
 	{
 		event_count = 0;
-		Util::Log::log(Util::Log::ERROR, "epoll ctl error");
+		Log::log(Log::ERROR, "epoll ctl error");
 		return ;
 	}
-	Util::Log::log(Util::Log::DEBUG, "epoll create");
+	Log::log(Log::DEBUG, "epoll create");
 }/*}}}*/
 
 IMReactor::~IMReactor() {
@@ -121,7 +121,7 @@ IMReactor* IMReactor::IMReactorInit(const char* IP, uint16_t port) {
 
 
 void IMReactor::loop() {/*{{{*/
-	Util::Log::log(Util::Log::DEBUG, "begin listen");
+	Log::log(Log::DEBUG, "begin listen");
 	const int MAX_EVENTS = 100000;
 	epoll_event eventss[MAX_EVENTS];
 	while(true)
@@ -242,7 +242,7 @@ void* IM::IMTaskCallBack (void *arg) { /*{{{*/
 
 	if(arg == nullptr) return nullptr;
 	TaskThread* taskTread = (TaskThread*)arg;
-	Util::Log::log(Util::Log::INFO, "IMTask线程启动成功！");
+	Log::log(Log::INFO, "IMTask线程启动成功！");
 	while(true)
 	{
 		auto task = taskTread->getTask();

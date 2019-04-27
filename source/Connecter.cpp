@@ -5,7 +5,7 @@
 
 #include "Connecter.h"
 #include "IMReactor.h"
-#include "UtilUtil::Log.h"
+#include "Log.h"
 
 
 using namespace IM;
@@ -60,7 +60,7 @@ int Connecter::recive(char* buf, size_t length) {
 			pthread_mutex_unlock(&mutex);
 			return 0;
 		} else {
-			Util::Log::log(Util::Log::ERROR, "read error in Connecter recive");
+			Log::log(Log::ERROR, "read error in Connecter recive");
 		}
 
 	} else {
@@ -94,7 +94,7 @@ bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
 			char msg[200];
 			::sprintf(msg, "realloc failed in tryRecive: maxLength = %d", static_cast<int>(maxLength));
 			
-			Util::Log::log(Util::Log::WARNING, msg);
+			Log::log(Log::WARNING, msg);
 			return false;
 		}
 		readBufbeg = maxLength + 10;
@@ -126,7 +126,7 @@ int Connecter::tryRecive(char* buf, size_t length) {
 		{
 			return 0;
 		} else {
-			Util::Log::log(Util::Log::ERROR, "read error in Connecter recive");
+			Log::log(Log::ERROR, "read error in Connecter recive");
 		}
 
 	} else {
@@ -201,7 +201,7 @@ bool Connecter::onWriteable() {
 		if(re == -1) {
 			char msg[BUFSIZ];
 			sprintf(msg, "write to socket error, errno : %s\n", ::strerror(errno));
-			Util::Log::log(Util::Log::ERROR, msg);
+			Log::log(Log::ERROR, msg);
 
 		}
 		if(static_cast<size_t>(re) < cur.getSize()) {

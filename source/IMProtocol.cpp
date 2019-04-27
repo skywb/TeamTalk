@@ -2,7 +2,7 @@
 
 #include "IMProtocol.h"
 #include "UtilPdu.h"
-#include "UtilUtil::Log.h"
+#include "Log.h"
 
 
 
@@ -124,7 +124,7 @@ IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 	}catch(TryReciveException &e) {
 		char msg[BUFSIZ];
 		sprintf(msg, "file %s : line %d: %s", __FILE__, __LINE__, e.what());
-		Util::Log::log(Util::Log::ERROR, msg);
+		Log::log(Log::ERROR, msg);
 		throw;
 	}
 	IMPduHeader* header = new IMPduHeader(buf, len);
