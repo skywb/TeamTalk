@@ -2,14 +2,14 @@
 #define IMPROTOCOL_H_RYFKP0LD
 
 #include <cstdio>
-#include <ostype.h>
+//#include <ostype.h>
 #include <memory.h>
 #include <string.h>
 #include <memory>
 
 #include "cmd.h"
-#include "UtilPdu.h"
-#include "Connecter.h"
+#include "util/UtilPdu.h"
+#include "reactor/Connecter.h"
 
 namespace IM {
 

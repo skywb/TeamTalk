@@ -60,10 +60,7 @@ private:
 class UnixAddresser : public Addresser
 {
 public:
-	UnixAddresser () {
-		::memset(&addr, 0, sizeof(addr));
-		addr.sun_family = AF_UNIX;
-	}
+	UnixAddresser () ;
 	UnixAddresser (const char* _path);
 	virtual ~UnixAddresser ();
 

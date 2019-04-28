@@ -1,8 +1,8 @@
 #include <cstring>
 
 #include "IMProtocol.h"
-#include "UtilPdu.h"
-#include "Log.h"
+#include "util/UtilPdu.h"
+#include "util/Log.h"
 
 
 
@@ -166,8 +166,6 @@ const char* IMPduHeader::getHeader (char* buf) {
 			command = INVALID;
 			break;
 	}
-	if(cur != len) 
-		command = INVALID;
 }
 
 

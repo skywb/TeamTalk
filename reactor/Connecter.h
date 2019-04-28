@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 #include "Addresser.h"
-#include "sockUtil.h"
+#include "util/sockUtil.h"
 
 namespace IM {
 

@@ -1,5 +1,5 @@
 #include "Addresser.h"
-#include "sockUtil.h"
+#include "util/sockUtil.h"
 
 namespace  BlueCat {
 
@@ -17,6 +17,8 @@ sockaddr* NetAddresser::getSockaddr() {
 
 
 UnixAddresser::UnixAddresser () {
+	::memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
 	sockUtil::setUnixAddr(&addr);
 }
 UnixAddresser::UnixAddresser (const char* _path) {
