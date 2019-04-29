@@ -5,8 +5,37 @@
 #include "util/Log.h"
 
 
+void fun(char* addr, size_t len) {
+	char ch;
+	for(int i=0; i<len; ++i)
+	{
+		ch = addr[i];
+		for(int j=0; j<8; ++j) {
+			std::cout << (ch&1) ? 1 : 0;
+			ch >>= 1;
+		}
+	}
+	std::cout << std::endl;
+}
+
+
 
 using namespace IM;
+
+
+
+const IMPduHeader::CMD IMPduHeader::LOGIN = 0x1ff;
+const IMPduHeader::CMD IMPduHeader::LOGOUT = 0x2ff;
+
+//在线命令
+const IMPduHeader::CMD IMPduHeader::SENDMSG = 0xf1f;
+
+//其他命令
+const IMPduHeader::CMD IMPduHeader::INVALID = 0xff1;
+
+const uint8_t IMPduHeader::HEADER_BEGIN = 0xff;
+
+
 
 //const uint32_t IMPdu::BUF_MAX_SIZE = 2048;
 //
@@ -69,7 +98,6 @@ IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 	userId = 0;
 	objUserId = 0;
 	bodyLength = 0;
-	command = 0;
 	command = *(CMD*)buf;
 	headerLength += sizeof(CMD);
 	switch (command) {
@@ -95,10 +123,69 @@ IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 			command = INVALID;
 			break;
 	}
+
 	if(headerLength != len) 
 		command = INVALID;
+
 }
 
+IMPduHeader::IMPduHeader(const char* buf) {
+	/* * 读取根据buf内容，读取协议头信息
+	 * <26-04-19, yourname> */
+
+	/* FIXIT:  <29-04-19, yourname> */
+	headerLength = 0;
+	userId = 0;
+	objUserId = 0;
+	bodyLength = 0;
+	command = 0;
+
+
+	//if(strlen(buf) < sizeof(HEADER_BEGIN) + sizeof(size_t)) {
+	//	command = INVALID;
+	//	std::cout << "this" << std::endl;
+	//	return;
+	//}
+
+	if(static_cast<int>(sizeof(HEADER_BEGIN)) < ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) {
+		command = INVALID;
+		return;
+	}
+
+	headerLength += sizeof(HEADER_BEGIN);
+	size_t len = *(size_t*)(buf+headerLength);
+	headerLength += sizeof(size_t);
+
+	command = *(CMD*)(buf + headerLength);
+	headerLength += sizeof(CMD);
+	switch (command) {
+		case LOGIN:
+			userId = *(UserId*)(buf+headerLength);
+			headerLength += sizeof(UserId);
+			bodyLength = *(BodyLength*)(buf+headerLength);
+			headerLength += sizeof(bodyLength);
+			break;
+		case LOGOUT:
+			userId = *(UserId*)(buf+headerLength);
+			headerLength += sizeof(UserId);
+			break;
+		case SENDMSG:
+			userId = *(UserId*)(buf+headerLength);
+			headerLength += sizeof(UserId);
+			objUserId = *(UserId*)(buf+headerLength);
+			headerLength += sizeof(UserId);
+			bodyLength = *(BodyLength*)(buf+headerLength);
+			headerLength += sizeof(bodyLength);
+			break;
+		default:
+			command = INVALID;
+			break;
+	}
+
+	if(headerLength != len) 
+		command = INVALID;
+
+}
 
 
 IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
@@ -138,34 +225,49 @@ IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 
 
 
-const char* IMPduHeader::getHeader (char* buf) {
-	char* p = buf;
+//根据协议头写成数据流
+
+
+
+const char* IMPduHeader::getHeader(char *buf) {
 	size_t cur = 0;
+
+	//::memcpy(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN));
+	::memcpy((void*)buf, (void*)&HEADER_BEGIN, sizeof(HEADER_BEGIN));
+	cur += sizeof(HEADER_BEGIN);
 	
+	//::memcpy(buf+cur, &headerLength, sizeof(headerLength));
+	cur += sizeof(headerLength);
+
+	::memcpy(buf+cur, &command, sizeof(CMD));
 	cur += sizeof(CMD);
 	switch (command) {
 		case LOGIN:
-			userId = *(UserId*)(buf+cur);
+			::memcpy(buf+cur, &userId, sizeof(UserId));
 			cur += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+cur);
+			::memcpy(buf+cur, &bodyLength, sizeof(BodyLength));
 			cur += sizeof(bodyLength);
 			break;
 		case LOGOUT:
-			userId = *(UserId*)(buf+cur);
+			::memcpy(buf+cur, &userId, sizeof(UserId));
 			cur += sizeof(UserId);
 			break;
 		case SENDMSG:
-			userId = *(UserId*)(buf+cur);
+			::memcpy(buf+cur, &userId, sizeof(UserId));
 			cur += sizeof(UserId);
-			objUserId = *(UserId*)(buf+cur);
+			::memcpy(buf+cur, &objUserId, sizeof(UserId));
 			cur += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+cur);
+			::memcpy(buf+cur, &bodyLength, sizeof(BodyLength));
 			cur += sizeof(bodyLength);
 			break;
 		default:
 			command = INVALID;
 			break;
 	}
+	headerLength = cur;
+
+	::memcpy(buf+sizeof(HEADER_BEGIN), &headerLength, sizeof(headerLength));
+	return buf;
 }
 
 

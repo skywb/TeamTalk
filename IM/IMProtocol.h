@@ -2,6 +2,7 @@
 #define IMPROTOCOL_H_RYFKP0LD
 
 #include <cstdio>
+#include <iostream>
 //#include <ostype.h>
 #include <memory.h>
 #include <string.h>
@@ -21,6 +22,7 @@ public:
 	typedef uint16_t CMD;
 
 	IMPduHeader () : headerLength(0), objUserId(0), bodyLength(0), command(INVALID) {}
+	IMPduHeader (const char* buf);
 	IMPduHeader (const char* buf, size_t len);
 
 	/* 读取一个协议头
@@ -81,6 +83,18 @@ public:
 	}
 
 
+public:
+	//未登录命令
+	static const CMD LOGIN;
+	static const CMD LOGOUT;
+
+	//在线命令
+	static const CMD SENDMSG;
+
+	//其他命令
+	static const CMD INVALID;
+
+	static const uint8_t HEADER_BEGIN;
 private:
 	//用户ID
 	size_t headerLength;
@@ -92,20 +106,9 @@ private:
 	//操作
 	CMD command;
 
-	static const uint8_t HEADER_BEGIN = 0xff;
 	static const uint32_t HEADER_MAX_LENGTH = sizeof(HEADER_BEGIN) + sizeof(UserId) + sizeof(UserId) + sizeof(BodyLength) + sizeof(CMD);
 	static const size_t BODY_MAX_LENGTH = 2048;
 
-public:
-	//未登录命令
-	static const CMD LOGIN = 0x1ff;
-	static const CMD LOGOUT = 0x2ff;
-
-	//在线命令
-	static const CMD SENDMSG = 0xf1f;
-
-	//其他命令
-	static const CMD INVALID = 0xff1;
 };
 
 
