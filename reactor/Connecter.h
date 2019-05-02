@@ -9,8 +9,9 @@
 #include <vector>
 #include <pthread.h>
 
-#include "Addresser.h"
+#include "reactor/Addresser.h"
 #include "util/sockUtil.h"
+
 
 namespace IM {
 
@@ -72,7 +73,8 @@ namespace IM {
 	{
 	public:
 		Connecter(int _sockfd) : 
-			sockfd(_sockfd), connected(true), TryReciving(false), readBufbeg(0),
+			sockfd(_sockfd), readable(true), writeable(true),
+		   	TryReciving(false), readBufbeg(0),
 			readBufend(0), writeBufHaveData(false), readBufMaxLenth(BUFSIZ*2)
 		{
 			readBuf = (char*)::malloc(BUFSIZ*2);
@@ -83,6 +85,11 @@ namespace IM {
 			::free(readBuf);
 			::close(sockfd);
 		}
+
+
+		//virtual void closeRead();
+
+		//virtual void closeWrite();
 
 		//读取数据
 		virtual int recive(char* buf, size_t minLength = 0);
@@ -100,13 +107,14 @@ namespace IM {
 		//发送数据
 		virtual int send(const char* msg);
 		virtual void closeThisConnecter();
+		//virtual void deleteThisConnecter();
 
 		//可写回调函数， 若所有数据都写完则返回true， 反之返回false
 		virtual bool onWriteable();
 
 		virtual bool isConnected() {
 			::pthread_mutex_lock(&mutex);
-			bool stat = connected;
+			bool stat = writeable | readable;
 			::pthread_mutex_unlock(&mutex);
 			return stat; 
 		}
@@ -115,7 +123,9 @@ namespace IM {
 		//正在连接的socket
 		int sockfd;
 		//是否是一个可用的连接
-		bool connected;
+		//bool connected;
+		bool readable;
+		bool writeable;
 
 		//是否已经startRevive
 		bool TryReciving;

@@ -3,8 +3,8 @@
 #include <netinet/ip.h>
 #include <exception>
 
-#include "Connecter.h"
-#include "IMReactor.h"
+#include "reactor/Connecter.h"
+#include "reactor/IMReactor.h"
 #include "util/Log.h"
 
 
@@ -22,6 +22,13 @@ void Buffer::backPointer(size_t len) {
 int Connecter::recive(char* buf, size_t length) {
 
 	::pthread_mutex_lock(&mutex);
+
+	if(readable == false) 
+	{
+		::pthread_mutex_unlock(&mutex);
+		return 0;
+	}
+
 
 	////若readBufbeg不为0 则之前调用了tryRecive未commit或未rollback
 	//assert(readBufbeg == 0);
@@ -50,8 +57,14 @@ int Connecter::recive(char* buf, size_t length) {
 	int re = ::read(sockfd, readBuf+readBufend, length);
 	if(re == 0) 
 	{
-		/* TODO:  <26-04-19, yourname> */
-		std::cout << "断开连接" << std::endl;
+		/* TODO: 
+		 * 从mp中删除该连接
+		 * <26-04-19, yourname> */
+		//std::cout << "断开连接" << std::endl;
+		//IM::IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLIN, sockfd));
+		closeThisConnecter();
+		pthread_mutex_unlock(&mutex);
+		return 0;
 	}
 	if(re == -1) {
 		//没有信息可以读
@@ -83,11 +96,17 @@ int Connecter::recive(char* buf, size_t length) {
 }
 
 bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
+
+	if(false == isConnected()) {
+		return false;
+	}
+
 	::pthread_mutex_lock(&mutex);
 
 	if(TryReciving == true) {
 		throw TryReciveException("TryReciving has started");
 	}
+
 	TryReciving = true;
 	if(maxLength >= readBufMaxLenth) {
 		if(nullptr == ::realloc(readBuf, maxLength+10)) {
@@ -108,6 +127,11 @@ int Connecter::tryRecive(char* buf, size_t length) {
 		throw TryReciveException("TryReciving has not started");
 	}
 
+	//当前已经加锁，不需要调用isConnected方法， 也不能调用， 否则死锁
+	if(true != readable) {
+		return -1;
+	}
+
 	if(readBufend - readBufbeg >= length) {
 		::strncpy(buf, readBuf+readBufbeg, length);
 		readBufbeg += length;
@@ -117,8 +141,12 @@ int Connecter::tryRecive(char* buf, size_t length) {
 	int re = ::read(sockfd, readBuf+readBufend, length);
 	if(re == 0) 
 	{
-		/* TODO:  <26-04-19, yourname> */
-		std::cout << "断开连接" << std::endl;
+		/* TODO: 
+		 * 从mp中删除该连接
+		 * <26-04-19, sky> */
+		closeThisConnecter();
+		return 0;
+		//std::cout << "断开连接" << std::endl;
 	}
 	if(re == -1) {
 		//没有信息可以读
@@ -166,6 +194,9 @@ bool Connecter::rollback_tryRecive() {
 
 
 int Connecter::send(const char* msg) {
+
+	if(false == isConnected()) return -1;
+
 	::pthread_mutex_lock(&mutex);
 	int re = 0;
 
@@ -186,11 +217,29 @@ int Connecter::send(const char* msg) {
 }
 
 void Connecter::closeThisConnecter() {
-	::pthread_mutex_lock(&mutex);
-	connected = false;
-	IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLIN, sockfd));
-	IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLOUT, sockfd));
-	::pthread_mutex_unlock(&mutex);
+
+	char buf[100];
+	sprintf(buf, "%d断开连接", sockfd);
+	Log::log(Log::DEBUG, buf);
+	if(readable || writeable) {
+		readable = false;
+		writeable = false;
+		IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLIN, sockfd));
+
+//		if(readable) {
+//			readable = false;
+//			IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLIN, sockfd));
+//		}
+//		if(writeable || writeBufHaveData) {
+//			writeable = false;
+//			writeBufHaveData = false;
+//			IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLOUT, sockfd));
+//			while(!writeBuf.empty()) {
+//				writeBuf.pop();
+//			}
+//		}
+	}
+	return ;
 }
 
 
@@ -198,6 +247,15 @@ bool Connecter::onWriteable() {
 
 	for(auto& cur = writeBuf.front(); !writeBuf.empty(); writeBuf.pop()) {
 		int re = ::write(sockfd, cur.getMsg(), cur.getSize());
+		if(re == 0) 
+		{
+			IM::IMReactor::optEventListen(Event(EPOLL_CTL_DEL, EPOLLOUT, sockfd));
+			if(false == isConnected()) {
+				auto reactor = IM::IMReactor::getInstances();
+				reactor->delConnecter(sockfd);
+			}
+			return false;
+		}
 		if(re == -1) {
 			char msg[BUFSIZ];
 			sprintf(msg, "write to socket error, errno : %s\n", ::strerror(errno));

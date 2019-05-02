@@ -6,7 +6,6 @@
 
 #include "Log.h"
 
-using namespace Util;
 
 static Log* _LogInstance = nullptr;
 

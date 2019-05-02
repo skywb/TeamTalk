@@ -12,7 +12,7 @@
 #include <sys/types.h>
 #include <pthread.h>
 
-#include "Connecter.h"
+#include "reactor/Connecter.h"
 
 
 namespace IM {
@@ -142,6 +142,11 @@ namespace IM {
 		std::shared_ptr<Connecter> getConnecter(int sockfd) {
 			return sockToConn[sockfd];	
 		}
+		void delConnecter(int sockfd) {
+			//从mp中删除这个connecter
+			sockToConn[sockfd].reset();
+		}
+
 		void eventAdd(Event event);
 
 		std::shared_ptr<TaskThread> getIdelThread();

@@ -3,7 +3,7 @@
 #include <fcntl.h>
 
 
-#include "IMReactor.h"
+#include "reactor/IMReactor.h"
 #include "util/Log.h"
 
 
@@ -91,8 +91,8 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	event_count = 1;
 	epoll_event event;
 	event.data.fd = sock_listen;
-	/* TODO: 改为ET模式 */
-	event.events = EPOLLIN;
+	event.events = EPOLLIN | EPOLLET;
+	sockUtil::setNoBlock(sock_listen);
 	if(-1 == epoll_ctl(epoll_root, EPOLL_CTL_ADD, sock_listen,  &event) )
 	{
 		event_count = 0;
@@ -135,7 +135,11 @@ void IMReactor::loop() {/*{{{*/
 				event.events = eve.getEvent() | EPOLLET;
 				event.data.fd = eve.getScoket();
 				epoll_ctl(epoll_root, eve.getOpt(), eve.getScoket(), &event);
-				sockToConn[eve.getScoket()] = std::make_shared<Connecter> (eve.getScoket());
+				if(eve.getOpt() == EPOLL_CTL_ADD)
+					sockToConn[eve.getScoket()] = std::make_shared<Connecter> (eve.getScoket());
+				else if(eve.getOpt() == EPOLL_CTL_DEL) 
+					sockToConn[eve.getScoket()].reset();
+
 				event_count++;
 				que.pop();
 			}
@@ -156,7 +160,7 @@ void IMReactor::loop() {/*{{{*/
 			auto& cur = eventss[i];
 			if(cur.data.fd == sock_listen) {
 				//新连接
-				std::cout << "新的连接" << std::endl;
+				//std::cout << "新的连接" << std::endl;
 				//处理新连接
 				//std::shared_ptr<Task> task = std::make_shared<NewConnectTask> (sockToConn[sock_listen]); 
 				////添加到一个线程任务中
@@ -164,13 +168,18 @@ void IMReactor::loop() {/*{{{*/
 				//taskThread->addTask(task);
 
 				
-				/* TODO: 
+				/* FIXIT: 
 				 * 此处代码应该拿到线程中去做
 				 * <24-04-19, sky> */
-				int nfd = sockUtil::acceptNewConnect(sock_listen);	
-				IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
+				while(true) {
+					int nfd = sockUtil::acceptNewConnect(sock_listen);	
+					if(nfd == -1) break;
+					//std::cout << "new sockfd = " << nfd << std::endl;
+					IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
+				}
 
 			} else {
+				//std::cout << "new msg" << std::endl;
 				if(cur.events == EPOLLIN) {
 					//可读 
 					/*
@@ -192,7 +201,7 @@ void IMReactor::loop() {/*{{{*/
 					 * 将task分配给工作线程
 					 */
 					auto connecter = getConnecter(cur.data.fd);
-					std::shared_ptr<Task> task = std::make_shared<Task> (connecter);
+					std::shared_ptr<Task> task = std::make_shared<WriteableTask> (connecter);
 					auto taskThread = getIdelThread();
 					taskThread->addTask(task);
 				}
@@ -282,24 +291,22 @@ void ReadableTask::doit() {
 }
 
 void WriteableTask::doit() {
-	/* TODO:  <07-04-19, yourname> */
-	/* 做可写事件处理
+	/*
+	 * 做可写事件处理
 	 * 将缓冲区的数据写入套接字内
 	 */
-
-	std::cout << "write task doing..." << std::endl;
+	p_con->onWriteable();
 }
 
 
 void NewConnectTask::doit() {
-	/* TODO:  <20-04-19, sky> 
-	 *
+	/* 弃用 
 	 * 接受一个或者多个新的连接
 	 * 为每个新的连接创建一个connecter， 并添加到sockToConn中
 	 * 想监听队列中添加一个需要监听的事件
 	 * */
 
-	std::cout << "NewConnect task doing..." << std::endl;
+	std::cout << "newConnect task doing..." << std::endl;
 
 }
 

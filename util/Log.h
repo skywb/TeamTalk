@@ -5,7 +5,6 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 
-#include "Util.h"
 class Log
 {
 	public:

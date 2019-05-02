@@ -15,8 +15,8 @@ namespace BlueCat {
 class Addresser
 {
 public:
-	Addresser ();
-	virtual ~Addresser ();
+	Addresser () {}
+	virtual ~Addresser () {}
 
 	virtual sockaddr* getSockaddr() = 0;
 	virtual socklen_t getAddressLenth() = 0;
@@ -82,5 +82,4 @@ private:
 }
 
 
-#endif /* end of include guard: ADDRESSER_H_XPCHAIJF
- */
+#endif /* end of include guard: ADDRESSER_H_XPCHAIJF */
