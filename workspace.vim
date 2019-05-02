@@ -5,5 +5,7 @@ let g:ycm_collect_identifiers_from_tags_files = 0
 
 command! Todo Ack! 'TODO|FIXME|CHANGED|BUG|HACK'
 
-set tags=./tags
+let PROJECT_HOME = $PWD
+
+set tags=$PWD/tags
 

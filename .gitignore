@@ -5,25 +5,8 @@ main
 #配置文件
 
 workspace.vim
-CMakeCache.txt
-CMakeFiles/
-IM/CMakeCache.txt
-IM/CMakeFiles/
-IM/Makefile
-IM/cmake_install.cmake
-IM/libIM.a
-Makefile
 build/
-cmake_install.cmake
-makefile.back
-reactor/CMakeFiles/
-reactor/Makefile
-reactor/cmake_install.cmake
-reactor/libReactor.a
 tags
-util/CMakeCache.txt
-util/CMakeFiles/
-util/Makefile
-util/cmake_install.cmake
-util/libUtil.a
+lib/
+bin/
 
