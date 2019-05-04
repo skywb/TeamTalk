@@ -14,12 +14,40 @@
 
 namespace IM {
 
+
+
+extern const uint16_t HEADER_BEGIN;
+
 class IMPduHeader {
+public:
+	/*! \enum CMDe
+	 *
+	 *  Detailed description
+	 */
+	enum CMD {
+		LOGIN, LOGOUT, 
+
+		SENDMSG, 
+
+		INVALID
+		
+	};
+	////未登录命令
+	//static const CMD LOGIN;
+	//static const CMD LOGOUT;
+
+	////在线命令
+	//static const CMD SENDMSG;
+
+	////其他命令
+	//static const CMD INVALID;
+
+	//static const uint8_t HEADER_BEGIN;
 public:
 	typedef uint64_t UserId;
 	//typedef std::string Password;
 	typedef uint32_t BodyLength;
-	typedef uint16_t CMD;
+	//typedef uint16_t CMD;
 
 	IMPduHeader () : headerLength(0), objUserId(0), bodyLength(0), command(INVALID) {}
 	IMPduHeader (const char* buf);
@@ -63,7 +91,7 @@ public:
 		bodyLength = len;
 	}
 
-	CMD getCommand () {
+	IM::IMPduHeader::CMD getCommand () {
 		return command;
 	}
 
@@ -83,18 +111,6 @@ public:
 	}
 
 
-public:
-	//未登录命令
-	static const CMD LOGIN;
-	static const CMD LOGOUT;
-
-	//在线命令
-	static const CMD SENDMSG;
-
-	//其他命令
-	static const CMD INVALID;
-
-	static const uint8_t HEADER_BEGIN;
 private:
 	//用户ID
 	size_t headerLength;
@@ -105,11 +121,23 @@ private:
 	BodyLength bodyLength;
 	//操作
 	CMD command;
+	//const uint16_t HEADER_BEGIN = 0x1fff;
 
 	static const uint32_t HEADER_MAX_LENGTH = sizeof(HEADER_BEGIN) + sizeof(UserId) + sizeof(UserId) + sizeof(BodyLength) + sizeof(CMD);
 	static const size_t BODY_MAX_LENGTH = 2048;
 
 };
+
+//const IMPduHeader::CMD IMPduHeader::LOGIN = 0x1ff;
+//const IMPduHeader::CMD IMPduHeader::LOGOUT = 0x2ff;
+//
+////在线命令
+//const IMPduHeader::CMD IMPduHeader::SENDMSG = 0xf1f;
+//
+////其他命令
+//const IMPduHeader::CMD IMPduHeader::INVALID = 0xff1;
+//
+//const uint8_t IMPduHeader::HEADER_BEGIN = 0xff;
 
 
 class IMPdu
@@ -141,6 +169,7 @@ private:
 	char buf[BUF_MAX_SIZE];
 	uint32_t head_len;
 };
+
 
 }
 #endif /* end of include guard: IMPROTOCOL_H_RYFKP0LD */

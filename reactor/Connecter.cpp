@@ -104,10 +104,12 @@ bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
 	::pthread_mutex_lock(&mutex);
 
 	if(TryReciving == true) {
+		::pthread_mutex_unlock(&mutex);
 		throw TryReciveException("TryReciving has started");
 	}
 
 	TryReciving = true;
+	readBufbeg = 0;
 	if(maxLength >= readBufMaxLenth) {
 		if(nullptr == ::realloc(readBuf, maxLength+10)) {
 			char msg[200];
@@ -116,7 +118,6 @@ bool Connecter::startTryRecive(size_t minLength, size_t maxLength) {
 			Log::log(Log::WARNING, msg);
 			return false;
 		}
-		readBufbeg = maxLength + 10;
 	}
 	return true;
 }
@@ -133,22 +134,23 @@ int Connecter::tryRecive(char* buf, size_t length) {
 	}
 
 	if(readBufend - readBufbeg >= length) {
-		::strncpy(buf, readBuf+readBufbeg, length);
+		::memcpy(buf, readBuf+readBufbeg, length);
 		readBufbeg += length;
 		return length;
 	}
 
-	int re = ::read(sockfd, readBuf+readBufend, length);
+	int re = ::read(sockfd, readBuf+readBufend, readBufMaxLenth-readBufend);
 	if(re == 0) 
 	{
 		/* TODO: 
 		 * 从mp中删除该连接
 		 * <26-04-19, sky> */
+		//std::cout << "close" << std::endl;
 		closeThisConnecter();
 		return 0;
 		//std::cout << "断开连接" << std::endl;
 	}
-	if(re == -1) {
+	else if(re == -1) {
 		//没有信息可以读
 		if(errno == EAGAIN)
 		{
@@ -163,7 +165,7 @@ int Connecter::tryRecive(char* buf, size_t length) {
 
 	//缓冲区数据加上读到的数据足够length
 	if(readBufend-readBufbeg >= length) {
-		::strncpy(buf, readBuf+readBufbeg, length);
+		::memcpy(buf, readBuf+readBufbeg, length);
 		readBufbeg += length;
 		return length;
 	}
@@ -176,9 +178,10 @@ bool Connecter::commit_tryRecive() {
 	if(TryReciving == false) {
 		throw TryReciveException("TryReciving has not started");
 	}
+	TryReciving = false;
 	size_t len = readBufend - readBufbeg;
 	::strncpy(readBuf, readBuf+readBufbeg, len);
-	readBufend -= len;
+	readBufend -= readBufbeg;
 	readBufbeg = 0;
 	::pthread_mutex_unlock(&mutex);
 	return true;
@@ -187,6 +190,7 @@ bool Connecter::rollback_tryRecive() {
 	if(TryReciving == false) {
 		throw TryReciveException("TryReciving has not started");
 	}
+	TryReciving = false;
 	readBufbeg = 0;
 	::pthread_mutex_unlock(&mutex);
 	return true;

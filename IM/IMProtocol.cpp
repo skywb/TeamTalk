@@ -5,35 +5,32 @@
 #include "util/Log.h"
 
 
-void fun(char* addr, size_t len) {
-	char ch;
-	for(int i=0; i<len; ++i)
-	{
-		ch = addr[i];
-		for(int j=0; j<8; ++j) {
-			std::cout << (ch&1) ? 1 : 0;
-			ch >>= 1;
-		}
-	}
-	std::cout << std::endl;
-}
+
+
+
+
+
+const uint16_t IM::HEADER_BEGIN = 0x1fff;
+
+
+//void fun(char* addr, size_t len) {
+//	char ch;
+//	for(int i=0; i<len; ++i)
+//	{
+//		ch = addr[i];
+//		for(int j=0; j<8; ++j) {
+//			std::cout << (ch&1) ? 1 : 0;
+//			ch >>= 1;
+//		}
+//	}
+//	std::cout << std::endl;
+//}
 
 
 
 using namespace IM;
 
 
-
-const IMPduHeader::CMD IMPduHeader::LOGIN = 0x1ff;
-const IMPduHeader::CMD IMPduHeader::LOGOUT = 0x2ff;
-
-//在线命令
-const IMPduHeader::CMD IMPduHeader::SENDMSG = 0xf1f;
-
-//其他命令
-const IMPduHeader::CMD IMPduHeader::INVALID = 0xff1;
-
-const uint8_t IMPduHeader::HEADER_BEGIN = 0xff;
 
 
 
@@ -91,6 +88,7 @@ const uint8_t IMPduHeader::HEADER_BEGIN = 0xff;
 
 
 
+
 IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 	/* * 读取根据buf内容，读取协议头信息
 	 * <26-04-19, yourname> */
@@ -100,6 +98,11 @@ IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 	bodyLength = 0;
 	command = *(CMD*)buf;
 	headerLength += sizeof(CMD);
+
+	char lbuf[BUFSIZ];
+	
+	printBity(buf, len);
+
 	switch (command) {
 		case LOGIN:
 			userId = *(UserId*)(buf+headerLength);
@@ -125,7 +128,9 @@ IMPduHeader::IMPduHeader(const char* buf, size_t len) {
 	}
 
 	if(headerLength != len) 
+	{
 		command = INVALID;
+	}
 
 }
 
@@ -138,7 +143,7 @@ IMPduHeader::IMPduHeader(const char* buf) {
 	userId = 0;
 	objUserId = 0;
 	bodyLength = 0;
-	command = 0;
+	command = INVALID;
 
 
 	//if(strlen(buf) < sizeof(HEADER_BEGIN) + sizeof(size_t)) {
@@ -147,7 +152,8 @@ IMPduHeader::IMPduHeader(const char* buf) {
 	//	return;
 	//}
 
-	if(static_cast<int>(sizeof(HEADER_BEGIN)) < ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) {
+	if( 0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) {
+		std::cout << "INVALID" << std::endl;
 		command = INVALID;
 		return;
 	}
@@ -155,6 +161,7 @@ IMPduHeader::IMPduHeader(const char* buf) {
 	headerLength += sizeof(HEADER_BEGIN);
 	size_t len = *(size_t*)(buf+headerLength);
 	headerLength += sizeof(size_t);
+
 
 	command = *(CMD*)(buf + headerLength);
 	headerLength += sizeof(CMD);
@@ -189,24 +196,35 @@ IMPduHeader::IMPduHeader(const char* buf) {
 
 
 IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
-	char buf[getHeaderMaxLenth()];
+	//char buf[getHeaderMaxLenth()];
+	char buf[BUFSIZ];
 	size_t len = 0;
+	size_t p = 0;
 	try {
 		size_t re = connecter_ptr->tryRecive(buf, sizeof(HEADER_BEGIN));
 		if(re == 0 || 
-				sizeof(HEADER_BEGIN) != 
-				::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
+			0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
 		{
+			return nullptr;
+		}
+		p += sizeof(HEADER_BEGIN);
+		std::cout << "recive " << re  << " p = " << p<< std::endl;
+		if(0 == connecter_ptr->tryRecive(buf+p, sizeof(size_t))) {
+			return nullptr;
+		}
+		//len = *(size_t*)(buf+p);
+		::memcpy(&len, buf+p, sizeof(size_t));
+		std::cout << "len = " << len << std::endl;
+		p += sizeof(size_t);
+		if(0 == connecter_ptr->tryRecive(buf+p, len-p)) {
+			return nullptr;
+		}
 
-			return nullptr;
-		}
-		if(0 == connecter_ptr->tryRecive(buf, sizeof(size_t))) {
-			return nullptr;
-		}
-		len = *(size_t*)buf;
-		if(0 == connecter_ptr->tryRecive(buf, len)) {
-			return nullptr;
-		}
+		printBity(buf, p);
+		printBity(buf+p, len-p);
+		p += len-p;
+		std::cout << "p = " << p << " len = " << len << std::endl;
+		std::cout << "header scuceed" << std::endl;
 	
 	}catch(TryReciveException &e) {
 		char msg[BUFSIZ];
@@ -214,6 +232,8 @@ IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 		Log::log(Log::ERROR, msg);
 		throw;
 	}
+
+
 	IMPduHeader* header = new IMPduHeader(buf, len);
 	if(IMPduHeader::INVALID == header->getCommand()) 
 	{

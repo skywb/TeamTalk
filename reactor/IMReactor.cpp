@@ -173,6 +173,7 @@ void IMReactor::loop() {/*{{{*/
 				 * <24-04-19, sky> */
 				while(true) {
 					int nfd = sockUtil::acceptNewConnect(sock_listen);	
+					sockUtil::setNoBlock(nfd);
 					if(nfd == -1) break;
 					//std::cout << "new sockfd = " << nfd << std::endl;
 					IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
@@ -259,55 +260,4 @@ void* IM::IMTaskCallBack (void *arg) { /*{{{*/
 	}
 
 }/*}}}*/
-
-
-void Task::doit() {
-
-	std::cout << "task doing..." << std::endl;
-}
-
-void ReadableTask::doit() {
-
-	while(true) {
-		char s[BUFSIZ];
-		int re = p_con->recive(s, 10);
-		if(re == 0) return;
-		std::cout << "recive " << re << " betys : " << s << std::endl;
-		p_con->send("msg from server:");
-		p_con->send(s);
-	}
-
-
-	/* TODO: 
-	 * 
-	 * 1. 读取最少一个协议头
-	 * 2. 读取消息
-	 * 3. 判断是否还有未读信息， 有则循环
-	 * 4. 执行对应的处理函数
-	 * 5. 若不足一个协议头则返回nullprt  跳过
-	 * <24-04-19, sky> */
-
-
-}
-
-void WriteableTask::doit() {
-	/*
-	 * 做可写事件处理
-	 * 将缓冲区的数据写入套接字内
-	 */
-	p_con->onWriteable();
-}
-
-
-void NewConnectTask::doit() {
-	/* 弃用 
-	 * 接受一个或者多个新的连接
-	 * 为每个新的连接创建一个connecter， 并添加到sockToConn中
-	 * 想监听队列中添加一个需要监听的事件
-	 * */
-
-	std::cout << "newConnect task doing..." << std::endl;
-
-}
-
 
