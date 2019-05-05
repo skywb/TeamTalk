@@ -43,22 +43,6 @@ public:
 
 	void setUserId (UserId id) { userId = id; }
 
-	//UserId getObjUserId () {
-	//	return objUserId;
-	//}
-
-	//void setObjUserId (UserId id) {
-	//	objUserId = id;
-	//}
-
-	//BodyLength getBodyLength () {
-	//	return bodyLength;
-	//}
-
-	//void setBodyLength (BodyLength len) {
-	//	bodyLength = len;
-	//}
-
 	IM::IMPduCMD getCommand () { return command; }
 
 	void setCommand (IMPduCMD cmd) { command = cmd; }
@@ -94,8 +78,6 @@ protected:
 	IMPduCMD command;
 
 	UserId userId;
-	//body
-	char bodyBuf[BODY_MAX_LENGTH];
 };
 
 
@@ -103,8 +85,8 @@ class LoginPdu : public IMPdu
 {
 public:
 	LoginPdu ();
-	LoginPdu (const char* buf);
-	virtual ~LoginPdu ();
+	LoginPdu (const char* buf, size_t headerLen);
+	virtual ~LoginPdu () { }
 
 	size_t serialization (char* buf) override;
 	const char* getBodyMsg (char* buf) override;
@@ -113,40 +95,41 @@ public:
 	const char* getPassword();
 
 private:
+	char password[BUFSIZ];
 
 };
 
-class Logout : public IMPdu
-{
-public:
-	Logout ();
-	virtual ~Logout ();
-
-	size_t serialization (char* buf) override;
-
-private:
-	const char* getBodyMsg (char* buf) override;
-};
-
-
-
-class SendMsgPdu : public IMPdu
-{
-public:
-	SendMsgPdu ();
-	virtual ~SendMsgPdu ();
-
-	size_t serialization (char* buf) override;
-	const char* getBodyMsg (char* buf) override;
-
-	void setObjID(UserId id) { objID = id; }
-	UserId getObjID() { return objID; }
-
-private:
-	UserId objID;
-
-};
-
+//class Logout : public IMPdu
+//{
+//public:
+//	Logout ();
+//	virtual ~Logout ();
+//
+//	size_t serialization (char* buf) override;
+//
+//private:
+//	const char* getBodyMsg (char* buf) override;
+//};
+//
+//
+//
+//class SendMsgPdu : public IMPdu
+//{
+//public:
+//	SendMsgPdu ();
+//	virtual ~SendMsgPdu ();
+//
+//	size_t serialization (char* buf) override;
+//	const char* getBodyMsg (char* buf) override;
+//
+//	void setObjID(UserId id) { objID = id; }
+//	UserId getObjID() { return objID; }
+//
+//private:
+//	UserId objID;
+//
+//};
+//
 
 
 /* 读取一个协议

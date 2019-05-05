@@ -106,12 +106,13 @@ using namespace IM;
 
 
 //从Connecter中读取, 解析协议， 返回一个IMPdu的智能指针
-std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
+std::shared_ptr<IMPdu> IM::makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 
 	char buf[BUFSIZ];
 	size_t len = 0;
 	size_t p = 0;
 	IMPduCMD cmd = INVALID;
+	connecter_ptr->startTryRecive(IM::IMPdu::getHeaderMinLength());
 	try {
 		//最小协议头包括开头信息，协议头长度， 以及cmd
 		size_t re = connecter_ptr->tryRecive(buf, IMPdu::getHeaderMinLength());
@@ -120,10 +121,11 @@ std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 		if(re == 0 || 
 			0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
 		{
+			connecter_ptr->rollback_tryRecive();
 			return nullptr;
 		}
 
-		p += sizeof(size_t);
+		p += sizeof(HEADER_BEGIN);
 		//获取协议头长度
 		len = *(size_t*)(buf+p);
 		p += sizeof(size_t);
@@ -134,16 +136,19 @@ std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 		//读取剩余部分
 		re = connecter_ptr->tryRecive(buf+p, len-p);
 		if(re == 0 || re < 0) {
+			connecter_ptr->rollback_tryRecive();
 			return nullptr;
 		}
 		p += len-p;
 		//不会发生
 		if(p != len) {
+			connecter_ptr->rollback_tryRecive();
 			return nullptr;
 		}
 
 	
 	}catch(TryReciveException &e) {
+		connecter_ptr->rollback_tryRecive();
 		char msg[BUFSIZ];
 		sprintf(msg, "file %s : line %d: %s", __FILE__, __LINE__, e.what());
 		Log::log(Log::ERROR, msg);
@@ -154,14 +159,14 @@ std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 
 	switch (cmd) {
 		case LOGIN:
-			pdu = std::make_shared<LoginPdu> (buf+p);
+			pdu = std::make_shared<LoginPdu> (buf+IMPdu::getHeaderMinLength(), len);
 			break;
-		case LOGOUT:
-			pdu = std::make_shared<Logout> (buf+p);
-			break;
-		case SENDMSG:
-			pdu = std::make_shared<SendMsgPdu> (buf+p);
-			break;
+		//case LOGOUT:
+		//	pdu = std::make_shared<Logout> (buf+p);
+		//	break;
+		//case SENDMSG:
+		//	pdu = std::make_shared<SendMsgPdu> (buf+p);
+		//	break;
 		case INVALID:
 		default:
 			return nullptr;
@@ -170,7 +175,10 @@ std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 
 	if(IMPduCMD::INVALID == pdu->getCommand()) 
 	{
+		connecter_ptr->rollback_tryRecive();
 		pdu = nullptr;
+	} else {
+		connecter_ptr->commit_tryRecive();
 	}
 	return pdu;
 }
@@ -199,14 +207,14 @@ std::shared_ptr<IMPdu> makeIMPdu(const char* buf) {
 
 	switch (cmd) {
 		case LOGIN:
-			pdu = std::make_shared<LoginPdu> (buf+p);
+			pdu = std::make_shared<LoginPdu> (buf+p, len);
 			break;
-		case LOGOUT:
-			pdu = std::make_shared<Logout> (buf+p);
-			break;
-		case SENDMSG:
-			pdu = std::make_shared<SendMsgPdu> (buf+p);
-			break;
+		//case LOGOUT:
+		//	pdu = std::make_shared<Logout> (buf+p);
+		//	break;
+		//case SENDMSG:
+		//	pdu = std::make_shared<SendMsgPdu> (buf+p);
+		//	break;
 		case INVALID:
 		default:
 			return nullptr;
@@ -221,25 +229,62 @@ std::shared_ptr<IMPdu> makeIMPdu(const char* buf) {
 }
 
 
-size_t IMPduToSerivlization(char* buf, std::shared_ptr<IMPdu> pdu) {
+size_t IM::IMPduToSerivlization(char* buf, std::shared_ptr<IMPdu> pdu) {
 
+	size_t cur = 0;
+
+	::memcpy(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN));
+	cur += sizeof(HEADER_BEGIN);
+	
+	cur += sizeof(size_t);
+
+	IMPduCMD cmd = pdu->getCommand();
+	::memcpy(buf+cur, &cmd, sizeof(IMPduCMD));
+	cur += sizeof(IMPduCMD);
+
+	cur += pdu->serialization(buf+cur);
+
+	::memcpy(buf+sizeof(HEADER_BEGIN), &cur, sizeof(size_t));
+	std::cout << cur << std::endl;
+	return  cur;
 }
+
+LoginPdu::LoginPdu() {
+	setCommand(LOGIN);
+}
+
+LoginPdu::LoginPdu(const char* buf, size_t headerLen) {
+	setCommand(LOGIN);
+	headerLength = headerLen;
+	size_t p = 0;
+	::memcpy(&userId, buf, sizeof(UserId));
+	p += sizeof(UserId);
+	::memcpy(password, buf+p, headerLength-p);
+}
+
 
 
 size_t LoginPdu::serialization(char* buf) {
-	
+	size_t p = 0;
+	::memcpy(buf, &userId, sizeof(UserId));
+	p += sizeof(UserId);
+	size_t len  = strlen(password);
+	::strncpy(buf+p, password, len);
+	p += len;
+	return p;
 }
 
 const char* LoginPdu::getBodyMsg (char* buf) {
-
+	::strncpy(buf, password, BUFSIZ);
+	return buf;
 }
 
 void LoginPdu::setPassword(const char* pwd) {
-
+	::strncpy(password, pwd, BUFSIZ);
 }
 
 const char* LoginPdu::getPassword() {
-
+	return password;
 }
 
 

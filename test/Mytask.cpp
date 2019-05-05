@@ -1,56 +1,28 @@
 #include <iostream>
+
 #include "reactor/task.h"
 #include "IM/IMProtocol.h"
 
 #include "util/testUtil.h"
 
 bool fun(std::shared_ptr<Connecter> con) {
-	//con->startTryRecive();
-	std::cout << "start..." << std::endl;
 
-	char buf[BUFSIZ];
-	int minLength = sizeof(IM::HEADER_BEGIN) + sizeof(size_t);
-	con->startTryRecive(minLength, BUFSIZ);
-
-	int re = con->tryRecive(buf, minLength);
-	if(re == 0) 
-	{
-		con->rollback_tryRecive();
+	auto pdu = IM::makeIMPdu(con);
+	if(!pdu) {
+		std::cout << "pdu is nullptr" << std::endl;
 		return true;
 	}
 
-	size_t len = *(size_t*)(buf+sizeof(HEADER_BEGIN));
+	std::cout << "base cnt " << pdu.use_count() << std::endl;
 
-	if(0 == con->tryRecive(buf+minLength, len-minLength)) {
-		con->rollback_tryRecive();
-		return true;
-	}
-	con->commit_tryRecive();
+	std::shared_ptr<LoginPdu> login = std::dynamic_pointer_cast<LoginPdu> (pdu);
+	std::cout << "base cnt " << pdu.use_count() << std::endl;
+	std::cout << "child cnt " << login.use_count() << std::endl;
 
+	std::cout << "is Login " << (login->getCommand() == IM::IMPduCMD::LOGIN ? "true" : "false") << std::endl;
+	std::cout << "user id is " << login->getUserId() << std::endl;
+	std::cout << "password is " << login->getPassword() << std::endl;
 
-	IMPduHeader* header = new IMPduHeader(buf);
-
-	if(header == nullptr) 
-	{
-		std::cout << "header is nullptr" << std::endl;
-		con->rollback_tryRecive();
-		return true;
-	}
-	if(header->getCommand() != IM::IMPduHeader::INVALID) {
-		std::cout << "cmd = ";
-		if(header->getCommand() == IM::IMPduHeader::LOGIN) {
-			std::cout << "login" << std::endl;
-		} else if(header->getCommand() == IM::IMPduHeader::LOGOUT) {
-			std::cout << "logout" << std::endl;
-
-		} else if(header->getCommand() == IM::IMPduHeader::SENDMSG) {
-			std::cout << "send msg" << std::endl;
-		}
-
-		std::cout << "userId = " <<  header->getUserId() << std::endl;
-		std::cout << "body length = " << header->getBodyLength() << std::endl;
-	}
-	std::cout << "send " << con->send("recived your msg") << std::endl;
 	return false;
 
 }

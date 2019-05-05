@@ -10,44 +10,23 @@ int main()
 	sockaddr_in addr;
 	sockUtil::setNetClientAddr(&addr, "127.0.0.1", 9999);
 	int fd = sockUtil::connectToAddr(&addr);
+	sockUtil::setNoBlock(fd);
 
-	IM::IMPduHeader header;
+	auto login = std::make_shared<IM::LoginPdu> ();
+	int id;
 	while(true) {
 		std::cout << "ID:" << std::endl;
-		IM::IMPduHeader::UserId id;
-		cin >> id;
-		std::cout << "cmd: 1.login, 2,logout, 3.sendmsg" << std::endl;
-		int cid;
-		cin >> cid;
-		IM::IMPduHeader::CMD cmd;
-		if(cid == 1) {
-			cmd = IM::IMPduHeader::LOGIN;
-			header.setCommand(cmd);
-			header.setUserId(id);
-			header.setBodyLength(0);
-		}
-		else if(cid == 2) {
-			cmd = IM::IMPduHeader::LOGOUT;
-			header.setCommand(cmd);
-			header.setUserId(id);
-		} else {
-			cmd = IM::IMPduHeader::SENDMSG;
-			header.setCommand(cmd);
-			header.setUserId(id);
-			header.setObjUserId(111);
-			header.setBodyLength(0);
-		}
-
-
+		std::cin >> id;
+		login->setUserId(id);
+		std::cout << "password" << std::endl;
+		char pwd[1000];
+		std::cin >> pwd;
+		login->setPassword(pwd);
 
 		char buf[BUFSIZ];
-		header.getHeader(buf);
-		sockUtil::setNoBlock(fd);
 
-		int len = header.getHeaderLenth();
-		int cnt = 0;
-
-		std::cout << "header len = " << len << std::endl;
+		size_t len = IM::IMPduToSerivlization(buf, login);
+		size_t cnt = 0;
 
 		int re = 0;
 		while(cnt < len) {
@@ -60,9 +39,7 @@ int main()
 		}
 
 		std::cout << re << std::endl;
-		printBity(buf, header.getHeaderLenth());
-
-
+		//printBity(buf, header.getHeaderLenth());
 	}
 	return 0;
 }
