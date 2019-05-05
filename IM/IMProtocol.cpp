@@ -5,226 +5,143 @@
 #include "util/Log.h"
 
 
-
-
-
-
-
 const uint16_t IM::HEADER_BEGIN = 0x1fff;
-
-
-//void fun(char* addr, size_t len) {
-//	char ch;
-//	for(int i=0; i<len; ++i)
-//	{
-//		ch = addr[i];
-//		for(int j=0; j<8; ++j) {
-//			std::cout << (ch&1) ? 1 : 0;
-//			ch >>= 1;
-//		}
-//	}
-//	std::cout << std::endl;
-//}
-
-
 
 using namespace IM;
 
-
-
-
-
-//const uint32_t IMPdu::BUF_MAX_SIZE = 2048;
+//IMPdu::IMPdu(const char* buf, size_t len) {
+//	/* * 读取根据buf内容，读取协议头信息
+//	 * <26-04-19, yourname> */
+//	headerLength = 0;
+//	userId = 0;
+//	objUserId = 0;
+//	bodyLength = 0;
+//	command = *(IMPduCMD*)buf;
+//	headerLength += sizeof(IMPduCMD);
 //
-//IMPdu::IMPdu (IM::CMD command) {
-//	m_header.command = static_cast<uint16_t>(command);
-//	m_header.body_length = 0;
-//	head_len = sizeof(m_header);
-//}
-//
-//char* IMPdu::getBuffer() {
-//	return m_buf;
-//}
-//
-//uint32_t IMPdu::getLength() {
-//	return m_header.body_length + m_header.header_length;
-//}
-//
-//char* IMPdu::getBodyData() {
-//	return m_buf+m_header.header_length;
-//}
-//uint32_t IMPdu::getBodyLength() {
-//	return m_header.body_length;
-//}
-//IM::CMD IMPdu::getCommand() {
-//	return IM::CMD(m_header.command);
-//
-//}
-//
-//void IMPdu::writeBody(const char* buf, uint32_t len) {
-//	if(len + m_header.header_length > BUF_MAX_SIZE) return;
-//	strncpy(m_buf, buf, len);
-//	m_header.body_length = len;
-//}
-//void IMPdu::setCommand(IM::CMD cmd) {
-//	m_header.command = cmd;
-//}
-//
-//void IMPdu::writeHeader() {
-//	::ByteStream::writeUint16(m_buf, m_header.command);
-//	::ByteStream::writeUint32(m_buf+16, m_header.body_length);
-//}
-//
-////static bool isProtocolAvailable(char* buf, uint32_t len, uint32_t& pdu_len);
-//shared_ptr<IMPdu> IMPdu::readPdu(char* buf, uint32_t len) {
-//	if(len < IMPduHeader::header_length) return nullptr;
-//
-//	uint16_t cmd = ::ByteStream::readUint16(buf);
-//	auto res = make_shared<IMPdu>(IM::CMD(cmd));
 //	
+//
+//	switch (command) {
+//		case LOGIN:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			bodyLength = *(BodyLength*)(buf+headerLength);
+//			headerLength += sizeof(bodyLength);
+//			break;
+//		case LOGOUT:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			break;
+//		case SENDMSG:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			objUserId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			bodyLength = *(BodyLength*)(buf+headerLength);
+//			headerLength += sizeof(bodyLength);
+//			break;
+//		default:
+//			command = INVALID;
+//			break;
+//	}
+//
+//	if(headerLength != len) 
+//	{
+//		command = INVALID;
+//	}
+//
 //}
-//void write(char* buf, uint32_t len) { m_buf.write((void*)buf, len); }
-//int readPduHeader(char* buf, uint32_t len);
 
 
+//IMPdu::IMPdu(const char* buf) {
+//	/* * 读取根据buf内容，读取协议信息
+//	 * <26-04-19, sky> */
+//
+//	headerLength = 0;
+//	userId = 0;
+//	command = INVALID;
+//
+//
+//	if( 0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) {
+//		Log::log(Log::INFO, "IMPdu failed");
+//		command = INVALID;
+//		return;
+//	}
+//
+//	headerLength += sizeof(HEADER_BEGIN);
+//	size_t len = *(size_t*)(buf+headerLength);
+//	headerLength += sizeof(size_t);
+//
+//
+//	command = *(IMPduCMD*)(buf + headerLength);
+//	headerLength += sizeof(IMPduCMD);
+//	switch (command) {
+//		case LOGIN:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			bodyLength = *(BodyLength*)(buf+headerLength);
+//			headerLength += sizeof(bodyLength);
+//			break;
+//		case LOGOUT:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			break;
+//		case SENDMSG:
+//			userId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			objUserId = *(UserId*)(buf+headerLength);
+//			headerLength += sizeof(UserId);
+//			bodyLength = *(BodyLength*)(buf+headerLength);
+//			headerLength += sizeof(bodyLength);
+//			break;
+//		default:
+//			command = INVALID;
+//			break;
+//	}
+//
+//	if(headerLength != len) 
+//		command = INVALID;
+//
+//}
 
 
-IMPduHeader::IMPduHeader(const char* buf, size_t len) {
-	/* * 读取根据buf内容，读取协议头信息
-	 * <26-04-19, yourname> */
-	headerLength = 0;
-	userId = 0;
-	objUserId = 0;
-	bodyLength = 0;
-	command = *(CMD*)buf;
-	headerLength += sizeof(CMD);
+//从Connecter中读取, 解析协议， 返回一个IMPdu的智能指针
+std::shared_ptr<IMPdu> makeIMPdu(std::shared_ptr<Connecter> connecter_ptr) {
 
-	char lbuf[BUFSIZ];
-	
-	printBity(buf, len);
-
-	switch (command) {
-		case LOGIN:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+headerLength);
-			headerLength += sizeof(bodyLength);
-			break;
-		case LOGOUT:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			break;
-		case SENDMSG:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			objUserId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+headerLength);
-			headerLength += sizeof(bodyLength);
-			break;
-		default:
-			command = INVALID;
-			break;
-	}
-
-	if(headerLength != len) 
-	{
-		command = INVALID;
-	}
-
-}
-
-IMPduHeader::IMPduHeader(const char* buf) {
-	/* * 读取根据buf内容，读取协议头信息
-	 * <26-04-19, yourname> */
-
-	/* FIXIT:  <29-04-19, yourname> */
-	headerLength = 0;
-	userId = 0;
-	objUserId = 0;
-	bodyLength = 0;
-	command = INVALID;
-
-
-	//if(strlen(buf) < sizeof(HEADER_BEGIN) + sizeof(size_t)) {
-	//	command = INVALID;
-	//	std::cout << "this" << std::endl;
-	//	return;
-	//}
-
-	if( 0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) {
-		std::cout << "INVALID" << std::endl;
-		command = INVALID;
-		return;
-	}
-
-	headerLength += sizeof(HEADER_BEGIN);
-	size_t len = *(size_t*)(buf+headerLength);
-	headerLength += sizeof(size_t);
-
-
-	command = *(CMD*)(buf + headerLength);
-	headerLength += sizeof(CMD);
-	switch (command) {
-		case LOGIN:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+headerLength);
-			headerLength += sizeof(bodyLength);
-			break;
-		case LOGOUT:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			break;
-		case SENDMSG:
-			userId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			objUserId = *(UserId*)(buf+headerLength);
-			headerLength += sizeof(UserId);
-			bodyLength = *(BodyLength*)(buf+headerLength);
-			headerLength += sizeof(bodyLength);
-			break;
-		default:
-			command = INVALID;
-			break;
-	}
-
-	if(headerLength != len) 
-		command = INVALID;
-
-}
-
-
-IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
-	//char buf[getHeaderMaxLenth()];
 	char buf[BUFSIZ];
 	size_t len = 0;
 	size_t p = 0;
+	IMPduCMD cmd = INVALID;
 	try {
-		size_t re = connecter_ptr->tryRecive(buf, sizeof(HEADER_BEGIN));
+		//最小协议头包括开头信息，协议头长度， 以及cmd
+		size_t re = connecter_ptr->tryRecive(buf, IMPdu::getHeaderMinLength());
+
+		//不足最小协议头或者不符合协议格式
 		if(re == 0 || 
 			0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
 		{
 			return nullptr;
 		}
-		p += sizeof(HEADER_BEGIN);
-		std::cout << "recive " << re  << " p = " << p<< std::endl;
-		if(0 == connecter_ptr->tryRecive(buf+p, sizeof(size_t))) {
+
+		p += sizeof(size_t);
+		//获取协议头长度
+		len = *(size_t*)(buf+p);
+		p += sizeof(size_t);
+
+		cmd = *(IMPduCMD*)(buf+p);
+		p += sizeof(IMPduCMD);
+
+		//读取剩余部分
+		re = connecter_ptr->tryRecive(buf+p, len-p);
+		if(re == 0 || re < 0) {
 			return nullptr;
 		}
-		//len = *(size_t*)(buf+p);
-		::memcpy(&len, buf+p, sizeof(size_t));
-		std::cout << "len = " << len << std::endl;
-		p += sizeof(size_t);
-		if(0 == connecter_ptr->tryRecive(buf+p, len-p)) {
+		p += len-p;
+		//不会发生
+		if(p != len) {
 			return nullptr;
 		}
 
-		printBity(buf, p);
-		printBity(buf+p, len-p);
-		p += len-p;
-		std::cout << "p = " << p << " len = " << len << std::endl;
-		std::cout << "header scuceed" << std::endl;
 	
 	}catch(TryReciveException &e) {
 		char msg[BUFSIZ];
@@ -233,23 +150,101 @@ IMPduHeader* IMPduHeader::makeHeader(std::shared_ptr<Connecter> connecter_ptr) {
 		throw;
 	}
 
+	std::shared_ptr<IMPdu> pdu;
 
-	IMPduHeader* header = new IMPduHeader(buf, len);
-	if(IMPduHeader::INVALID == header->getCommand()) 
-	{
-		delete header;
-		header = nullptr;
+	switch (cmd) {
+		case LOGIN:
+			pdu = std::make_shared<LoginPdu> (buf+p);
+			break;
+		case LOGOUT:
+			pdu = std::make_shared<Logout> (buf+p);
+			break;
+		case SENDMSG:
+			pdu = std::make_shared<SendMsgPdu> (buf+p);
+			break;
+		case INVALID:
+		default:
+			return nullptr;
+			break;
 	}
-	return header;
+
+	if(IMPduCMD::INVALID == pdu->getCommand()) 
+	{
+		pdu = nullptr;
+	}
+	return pdu;
 }
 
 
+std::shared_ptr<IMPdu> makeIMPdu(const char* buf) {
 
-//根据协议头写成数据流
+	size_t p = 0;
+	size_t len = 0;
+	IMPduCMD cmd = INVALID;
+	//不足最小协议头或者不符合协议格式
+	if(0 != ::memcmp(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN))) 
+	{
+		return nullptr;
+	}
+
+	p += sizeof(size_t);
+	//获取协议头长度
+	len = *(size_t*)(buf+p);
+	p += sizeof(size_t);
+
+	cmd = *(IMPduCMD*)(buf+p);
+	p += sizeof(IMPduCMD);
+
+	std::shared_ptr<IMPdu> pdu;
+
+	switch (cmd) {
+		case LOGIN:
+			pdu = std::make_shared<LoginPdu> (buf+p);
+			break;
+		case LOGOUT:
+			pdu = std::make_shared<Logout> (buf+p);
+			break;
+		case SENDMSG:
+			pdu = std::make_shared<SendMsgPdu> (buf+p);
+			break;
+		case INVALID:
+		default:
+			return nullptr;
+			break;
+	}
+
+	if(IMPduCMD::INVALID == pdu->getCommand()) 
+	{
+		pdu = nullptr;
+	}
+	return pdu;
+}
 
 
+size_t IMPduToSerivlization(char* buf, std::shared_ptr<IMPdu> pdu) {
 
-const char* IMPduHeader::getHeader(char *buf) {
+}
+
+
+size_t LoginPdu::serialization(char* buf) {
+	
+}
+
+const char* LoginPdu::getBodyMsg (char* buf) {
+
+}
+
+void LoginPdu::setPassword(const char* pwd) {
+
+}
+
+const char* LoginPdu::getPassword() {
+
+}
+
+
+/*
+const char* IMPdu::getHeader(char *buf) {
 	size_t cur = 0;
 
 	//::memcpy(buf, &HEADER_BEGIN, sizeof(HEADER_BEGIN));
@@ -259,8 +254,8 @@ const char* IMPduHeader::getHeader(char *buf) {
 	//::memcpy(buf+cur, &headerLength, sizeof(headerLength));
 	cur += sizeof(headerLength);
 
-	::memcpy(buf+cur, &command, sizeof(CMD));
-	cur += sizeof(CMD);
+	::memcpy(buf+cur, &command, sizeof(IMPduCMD));
+	cur += sizeof(IMPduCMD);
 	switch (command) {
 		case LOGIN:
 			::memcpy(buf+cur, &userId, sizeof(UserId));
@@ -289,19 +284,5 @@ const char* IMPduHeader::getHeader(char *buf) {
 	::memcpy(buf+sizeof(HEADER_BEGIN), &headerLength, sizeof(headerLength));
 	return buf;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+*/
 
