@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 
 #include "util/Log.h"
 #include "reactor/IMReactor.h"
@@ -13,9 +14,5 @@ int main()
 	auto reactor = IM::IMReactor::IMReactorInit(nullptr, 9999);
 
 	reactor->loop();
-
-
-
-	
 	return 0;
 }

@@ -12,34 +12,59 @@ int main()
 	int fd = sockUtil::connectToAddr(&addr);
 	sockUtil::setNoBlock(fd);
 
-	auto login = std::make_shared<IM::LoginPdu> ();
-	int id;
+	int cmd;
+	std::shared_ptr<IM::IMPdu> pdu;
+	char buf[BUFSIZ];
 	while(true) {
-		std::cout << "ID:" << std::endl;
-		std::cin >> id;
-		login->setUserId(id);
-		std::cout << "password" << std::endl;
-		char pwd[1000];
-		std::cin >> pwd;
-		login->setPassword(pwd);
-
-		char buf[BUFSIZ];
-
-		size_t len = IM::IMPduToSerivlization(buf, login);
-		size_t cnt = 0;
-
-		int re = 0;
-		while(cnt < len) {
-			re = write(fd, buf+cnt, len-cnt);
-			cnt += re;
-			if(re < 0) 
-			{
-				std::cout << strerror(errno)<< std::endl;
-			}
+		//system("clear");
+		std::cout << "类型：1.login 2.logout 3.sendmsg" << std::endl;
+		std::cin >> cmd;
+		IM::IMPdu::UserId id;
+		//std::string msg;
+		char msg[BUFSIZ];
+		size_t msg_len = 0;
+		switch (cmd) {
+			case 1:
+				pdu =  std::make_shared<IM::LoginPdu> ();	
+				std::cout << "your ID: ";
+				std::cin >> id;
+				pdu->setUserId(id);
+				char pwd[100];
+				std::cout << "密码： ";
+				std::cin >> pwd;
+				std::dynamic_pointer_cast<IM::LoginPdu> (pdu)->setPassword(pwd);
+				break;
+			case 2:
+				pdu = std::make_shared<IM::Logout> ();
+				std::cout << "your ID: ";
+				std::cin >> id;
+				pdu->setUserId(id);
+				break;
+			case 3:
+				pdu = std::make_shared<IM::SendMsgPdu> ();
+				std::cout << "your ID: ";
+				std::cin >> id;
+				pdu->setUserId(id);
+				IM::IMPdu::UserId objId;
+				std::cout << "objID : ";
+				std::cin >> objId;	
+				std::dynamic_pointer_cast<IM::SendMsgPdu> (pdu)->setObjID(objId);
+				std::cout << "MSG : ";
+				std::cin >> msg;	
+				msg_len = strlen(msg);
+				std::dynamic_pointer_cast<IM::SendMsgPdu> (pdu)->setBodyMsg(msg, msg_len);
+				break;
+			default:
+				std::cout << "What are you doing?" << std::endl;
+				continue;
+				break;
 		}
-
-		std::cout << re << std::endl;
-		//printBity(buf, header.getHeaderLenth());
+		int len = IM::IMPduToSerivlization(buf, pdu);
+		std::cout << pdu->getHeaderLenth() << std::endl;
+		int re  =  write(fd, buf, len);
+		if(re == -1) {
+			std::cout << strerror(errno) << std::endl;
+		}  else   std::cout << "write " << re << "Byte" << std::endl;
 	}
 	return 0;
 }

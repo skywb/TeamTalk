@@ -4,7 +4,6 @@
 #include "IM/IMProtocol.h"
 
 #include "util/testUtil.h"
-
 bool fun(std::shared_ptr<Connecter> con) {
 
 	auto pdu = IM::makeIMPdu(con);
@@ -13,18 +12,28 @@ bool fun(std::shared_ptr<Connecter> con) {
 		return true;
 	}
 
-	std::cout << "base cnt " << pdu.use_count() << std::endl;
-
-	std::shared_ptr<LoginPdu> login = std::dynamic_pointer_cast<LoginPdu> (pdu);
-	std::cout << "base cnt " << pdu.use_count() << std::endl;
-	std::cout << "child cnt " << login.use_count() << std::endl;
-
-	std::cout << "is Login " << (login->getCommand() == IM::IMPduCMD::LOGIN ? "true" : "false") << std::endl;
-	std::cout << "user id is " << login->getUserId() << std::endl;
-	std::cout << "password is " << login->getPassword() << std::endl;
-
+	char buf[BUFSIZ];
+	switch (pdu->getCommand()) {
+		case IM::LOGIN:
+			std::cout << "CDM: LOGIN" << std::endl;	
+			std::cout << "ID: " << pdu->getUserId() << std::endl;
+			std::cout << "PWD: " << std::dynamic_pointer_cast<IM::LoginPdu> (pdu)->getPassword() << std::endl;
+			break;
+		case IM::LOGOUT:
+			std::cout << "CDM: LOGOUT" << std::endl;	
+			std::cout << "ID: " << pdu->getUserId() << std::endl;
+			break;
+		case IM::SENDMSG:
+			std::cout << "CDM: SENDMSG" << std::endl;	
+			std::cout << "ID:  " << pdu->getUserId() << std::endl;
+			std::cout << "ObjID:  " <<  std::dynamic_pointer_cast<IM::SendMsgPdu>(pdu)->getObjID() << std::endl;
+			std::cout << "MSG: " << std::dynamic_pointer_cast<IM::SendMsgPdu>(pdu)->getBodyMsg(buf) << std::endl;	
+			break;
+		default:
+			std::cout << "无法识别" << std::endl;
+			break;
+	}
 	return false;
-
 }
 
 
@@ -33,15 +42,5 @@ void ReadableTask::doit() {
 
 	while(!fun(p_con));
 
-
-	/* TODO: 
-	 * 
-	 * 1. 读取最少一个协议头
-	 * 2. 读取消息
-	 * 3. 判断是否还有未读信息， 有则循环
-	 * 4. 执行对应的处理函数
-	 * 5. 若不足一个协议头则返回nullprt  跳过
-	 * <24-04-19, sky> */
-
-
 }
+
