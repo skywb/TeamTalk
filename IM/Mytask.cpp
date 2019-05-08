@@ -2,34 +2,8 @@
 #include "reactor/task.h"
 #include "IM/IMProtocol.h"
 
-void fun(std::shared_ptr<Connecter> con) {
-	con->startTryRecive();
-	auto header = IM::IMPduHeader::makeHeader(con);
-	if(header->getCommand() != IM::IMPduHeader::INVALID) {
-		std::cout << "cmd = ";
-		if(header->getCommand() == IM::IMPduHeader::LOGIN) {
-			std::cout << "login" << std::endl;
-		} else if(header->getCommand() == IM::IMPduHeader::LOGOUT) {
-			std::cout << "logout" << std::endl;
-
-		} else if(header->getCommand() == IM::IMPduHeader::SENDMSG) {
-			std::cout << "send msg" << std::endl;
-		}
-
-		std::cout << "userId = " <<  header->getUserId() << std::endl;
-		std::cout << "body length = " << header->getBodyLength() << std::endl;
-	}
-
-	con->send("recived your msg");
-
-
-}
-
-
 
 void ReadableTask::doit() {
-
-	fun(p_con);
 
 
 	/* TODO: 

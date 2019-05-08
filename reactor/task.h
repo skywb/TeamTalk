@@ -2,6 +2,7 @@
 #define TASK_H_TKQEYUJB
 
 #include "reactor/Connecter.h"
+#include "IM/IMProtocol.h"
 
 using namespace IM;
 /*
@@ -59,6 +60,18 @@ class NewConnectTask : public Task
 
 };
 
+class LoginTask : public Task
+{
+public:
+	LoginTask ();
+	virtual ~LoginTask ();
+
+	void doit() override ;
+
+private:
+	std::shared_ptr<IM::LoginPdu> user;
+	std::shared_ptr<Connecter> con;
+};
 
 
 #endif /* end of include guard: TASK_H_TKQEYUJB */

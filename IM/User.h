@@ -7,17 +7,16 @@
 #include <unistd.h>
 #include <vector>
 
+#include "IM/IMProtocol.h"
+
 
 class User
 {
 public:
 	typedef unsigned int Account;
-	User (Account id = 0) : id(id), friends_ptr(nullptr) {
-		_mutex = PTHREAD_MUTEX_INITIALIZER;
-	}
-	virtual ~User () {
-		pthread_mutex_destroy(&_mutex);
-	}
+
+	User (Account id = 0) : id(id){ }
+	virtual ~User () { }
 	
 	Account getId() { return id; }
 	void setId(Account ID) { id = ID;}
@@ -29,26 +28,33 @@ public:
 	void setPassword(std::string psw) { password = psw; }
 	std::string getPassword() { return password;}
 
-	std::shared_ptr<std::vector<Account> > getFriends() {
-		/* TODO: 加锁 */
-		if(friends_ptr) return friends_ptr;
-		else {
-			if(friends.empty()) return nullptr;
-			splitFriends();
-			return friends_ptr;
-		}
+	std::string getFriends() {
+		return friends;
+	}
+	void setFriends(const char* friends) {
+		this->friends = friends;
+	}
+	void setFriends(const std::string friends) {
+		this->friends = friends;
 	}
 
-	void setFriends(std::string fs) { friends = fs; }
-	std::string getSqlFriends() { return friends;}
+	//std::shared_ptr<std::vector<Account> > getFriends() {
+	//	/* TODO: 加锁 */
+	//	if(friends_ptr) return friends_ptr;
+	//	else {
+	//		if(friends.empty()) return nullptr;
+	//		splitFriends();
+	//		return friends_ptr;
+	//	}
+	//}
+
 
 private:
 	Account id;
 	std::string name;
 	std::string password;
 	std::string friends;
-	std::shared_ptr<std::vector<Account> > friends_ptr;
-	pthread_mutex_t _mutex;
+	//std::shared_ptr<std::vector<Account> > friends_ptr;
 
 	void splitFriends();
 };

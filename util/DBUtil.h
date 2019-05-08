@@ -5,6 +5,7 @@
 #include <mysql/jdbc/cppconn/driver.h>
 #include <mysql/jdbc/cppconn/connection.h>
 #include <mysql/jdbc/cppconn/statement.h>
+#include <mysql/jdbc/cppconn/prepared_statement.h>
 
 
 
@@ -12,16 +13,17 @@
 #define MYSQLACCOUNT "root"
 #define MYSQLPASSWORD "root"
 
-#include "User.h"
+#include "IM/User.h"
 
 namespace DBUtil {
-	class Dao
-	{
+
+class Dao
+{
 	public:
 		virtual ~Dao () {
 			delete conn;
 		}
-	
+
 	protected:
 		sql::Driver *driver;
 		sql::Connection *conn;
@@ -31,20 +33,7 @@ namespace DBUtil {
 
 			conn->createStatement()->execute("use teamtalk");
 		}
-	};
-
-	class UserDao : public Dao
-	{
-	public:
-		UserDao (): Dao(MYSQLSERVERURL, MYSQLACCOUNT, MYSQLPASSWORD) {
-		}
-		virtual ~UserDao () {
-		}
-
-		bool insert(User *user);
-		User* Obtain(User::Account id);
-
-	};
+};
 
 }
 
