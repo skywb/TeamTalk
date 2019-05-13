@@ -41,6 +41,7 @@ void login_server(std::shared_ptr<IM::LoginPdu> pdu) {
 	user.setId(pdu->getUserId());
 	user.setPassword(pdu->getPassword());
 
+
 	/* TODO: 
 	 * 从数据库获取user信息
 	 * 对比密码

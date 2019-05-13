@@ -18,6 +18,7 @@ aux_source_directory(. DIR_SRC)
 add_subdirectory(IM)
 add_subdirectory(reactor)
 add_subdirectory(util)
+add_subdirectory(dao)
 add_subdirectory(test)
 
 
@@ -29,3 +30,7 @@ add_subdirectory(test)
 
 #target_link_libraries(main IM Util Reactor pthread)
 
+
+enable_testing()
+
+add_test(NAME TDao COMMAND testDao)

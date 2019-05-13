@@ -4,8 +4,9 @@
 #include "util/DBUtil.h"
 
 
+UserDao *UserDao::object = new UserDao();
 
-bool UserDao::insert(User *user) {
+bool UserDao::_insert(User *user) {
 	
 	/*
 	 * function:
@@ -23,9 +24,9 @@ bool UserDao::insert(User *user) {
 		pre_stmt->setString(3, user->getName());
 		pre_stmt->setString(4, user->getFriends());
 
-		bool ok = pre_stmt->execute();
+		int re  = pre_stmt->executeUpdate();
 		delete pre_stmt;
-		return ok;
+		return (re == 1);
 	}catch(sql::SQLException &e) {
 	
 		//std::cerr << e.getSQLState() << std::endl;
@@ -38,7 +39,7 @@ bool UserDao::insert(User *user) {
 }
 
 
-User* UserDao::Obtain(User::Account id) {
+User* UserDao::_obtain(User::Account id) {
 
 
 	/* function:
@@ -115,3 +116,61 @@ User* UserDao::Obtain(User::Account id) {
 	} 
 	return nullptr;
 }
+
+
+
+
+bool UserDao::_delete(User::Account id) {
+		
+	sql::PreparedStatement * stmt = nullptr;
+	sql::ResultSet *res = nullptr;
+
+	try {
+	
+		stmt = conn->prepareStatement("DELETE FROM account WHERE id=?");
+		
+		stmt->setUInt64(1, id);
+		int re = stmt->executeUpdate();
+
+		delete res;
+		delete stmt;
+		return (re == 1);
+
+	}catch(sql::SQLException &e) {
+		if(res) delete res;
+		if(stmt) delete stmt;
+		std::cerr <<  __FILE__ << " : " << __LINE__ << " : " << e.what() << std::endl;
+	} 
+	return false;
+
+}
+
+bool UserDao::_update(User *user) {
+	sql::PreparedStatement *stmt = nullptr;
+	sql::ResultSet *res = nullptr;
+
+	try {
+	
+		stmt = conn->prepareStatement("UPDATE account SET password=?, name=?, friend=? WHERE id=?");
+		
+		stmt->setString(1, user->getPassword());
+		stmt->setString(2, user->getName());
+		stmt->setString(3, user->getFriends());
+		stmt->setUInt64(4, user->getId());
+
+		int re = stmt->executeUpdate();
+
+		delete res;
+		delete stmt;
+		return (re == 1);
+
+	}catch(sql::SQLException &e) {
+		if(res) delete res;
+		if(stmt) delete stmt;
+		std::cerr <<  __FILE__ << " : " << __LINE__ << " : " << e.what() << std::endl;
+	} 
+	return false;
+
+}
+
+
