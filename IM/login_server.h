@@ -8,43 +8,55 @@
 
 
 
-class SockMap
+class ConnMap
 {
 public:
-	virtual ~SockMap () {
+	virtual ~ConnMap () {
 		::pthread_mutex_destroy(&m_mutex);
 	}
 
-	static void init() {
-		object_p = new SockMap();
+	//static void init() {
+	//	object_p = new SockMap();
+	//}
+
+	//根据用户ID返回Connecter
+	//若用户不在线则返回-1
+	static std::shared_ptr<IM::Connecter> findConnecterById(int id) {
+		if(object_p == nullptr) {
+			std::cout << "object_p is nullptr" << std::endl;
+		}
+		return object_p->find(id);
 	}
 
-	static int findSocketById(int fd) {
-		if(object_p == nullptr) init();
-		return object_p->findId(fd);
-	}
-
-	static bool addAccount(std::pair<User::Account, int> p) {
-		if(object_p == nullptr) init();
+	//添加一个在线用户
+	//若已经在线返回false
+	static std::shared_ptr<IM::Connecter> addAccount(std::pair<User::Account, std::shared_ptr<IM::Connecter>> p) {
+		if(object_p == nullptr) {
+			std::cout << "object_p is nullptr" << std::endl;
+		}
 		return object_p->add(p);
 	}
 
-	static bool delAccount(std::pair<User::Account, int> p) {
-		if(object_p == nullptr) init();
+	//删除一个在线用户
+	//若用户不在线， 返回false
+	static bool delAccount(std::pair<User::Account, std::shared_ptr<IM::Connecter>> p) {
+		if(object_p == nullptr) {
+			std::cout << "object_p is nullptr" << std::endl;
+		}
 		return object_p->del(p);
 	}
-	int findId(int fd);
-	bool add(std::pair<User::Account, int> p);
-	bool del(std::pair<User::Account, int> p);
+	std::shared_ptr<IM::Connecter> find(int fd);
+	std::shared_ptr<IM::Connecter> add(std::pair<User::Account, std::shared_ptr<IM::Connecter>> p);
+	bool del(std::pair<User::Account, std::shared_ptr<IM::Connecter>> p);
 
 private:
-	SockMap () {
+	ConnMap () {
 		::pthread_mutex_init(&m_mutex, nullptr);
 	}
-	static SockMap* object_p;
-	std::map<User::Account, int> m_map;
+	static ConnMap* object_p;
+	std::map<User::Account, std::shared_ptr<IM::Connecter>> m_map;
 	pthread_mutex_t m_mutex;
 
 };
 
-void login_server(std::shared_ptr<IM::LoginPdu> pdu);
+void login_server(std::shared_ptr<IM::LoginPdu> pdu, std::shared_ptr<IM::Connecter> con);

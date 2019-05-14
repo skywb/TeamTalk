@@ -4,6 +4,7 @@
 #include "IM/IMProtocol.h"
 #include "IM/login_server.h"
 
+using namespace	IM;
 
 void Task::doit() {
 
@@ -18,10 +19,11 @@ void ReadableTask::doit() {
 		if(!pdu) {
 			break;
 		}
+		std::cout << "new Pdu" << std::endl;
 
 		switch (pdu->getCommand()) {
 			case IM::LOGIN:
-				login_server(std::dynamic_pointer_cast<IM::LoginPdu> (pdu));
+				login_server(std::dynamic_pointer_cast<IM::LoginPdu> (pdu), p_con);
 				break;
 			case IM::LOGOUT:
 				std::cout << "logout" << std::endl;

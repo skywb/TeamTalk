@@ -25,12 +25,12 @@ add_subdirectory(test)
 #SET(LIBRARY_OUTPUT_PATH lib)
 
 
+#add_executable(server server.cpp)
 #add_executable(main ${DIR_SRC})
-#add_executable(main ${DIR_SRC})
 
-#target_link_libraries(main IM Util Reactor pthread)
+#target_link_libraries(server IM Util Reactor dao mysqlcppconn pthread)
 
 
-enable_testing()
-
-add_test(NAME TDao COMMAND testDao)
+#enable_testing()
+#
+#add_test(NAME TDao COMMAND testDao)
