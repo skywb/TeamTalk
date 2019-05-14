@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <cstring>
 #include <fcntl.h>
+#include <functional>
 
 
 #include "reactor/IMReactor.h"
@@ -12,6 +13,90 @@ using namespace IM;
 
 IMReactor* IMReactor::_thisReactor = nullptr;
 
+
+void ThreadPool::callBack_threadPool(ThreadPool* p) {
+	while(true) {
+		auto task = p->getTask();
+		if(task == nullptr) break;
+		task->doit();
+	}
+}
+
+
+ThreadPool::ThreadPool(size_t num) : 
+	m_mutex(), m_cond(), thread_num(num), 
+	m_started(false) {
+}
+
+
+
+ThreadPool::~ThreadPool() {
+	if(m_started) {
+		stop();
+	}
+}
+
+
+void ThreadPool::start() {
+	assert(threads.empty());
+	m_started = true;
+	for(size_t i=0; i<thread_num; ++i) {
+		threads.push_back(
+				std::make_shared<std::thread> (
+					std::bind(callBack_threadPool, this)));
+	}
+}
+
+
+void ThreadPool::stop() {
+	{ std::unique_lock<std::mutex> lock(m_mutex);
+		m_started = false;
+		//唤醒所有等待的线程， 线程自动退出, 等待回收
+		m_cond.notify_all();
+	}
+
+	for(auto& i : threads) {
+		i->join();
+		i = nullptr;
+	}
+	threads.clear();
+}
+
+bool ThreadPool::addTask(std::shared_ptr<Task> task) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	if(m_started == false) return false;
+	taskQue.push(task);
+	m_cond.notify_one();
+	return true;
+}
+
+std::shared_ptr<Task> ThreadPool::getTask() {
+	std::unique_lock<std::mutex> lock(m_mutex);
+
+	while(taskQue.empty() || m_started ) {
+		m_cond.wait(lock);
+	}
+
+	Log::log(Log::INFO, "thread getTask");
+	if(m_started && !taskQue.empty()) {
+		auto res = taskQue.front();
+		taskQue.pop();
+		return res;
+	}
+	return nullptr;
+}
+
+bool ThreadPool::addThreadsToPool(size_t num) {
+	/* TODO:  <14-05-19, yourname> */
+	(void)num;	
+	return false;
+}
+
+bool ThreadPool::reducedThreadsFromPool(size_t num) {
+	/* TODO:  <14-05-19, yourname> */
+	(void)num;	
+	return false;
+}
 
 
 TaskThread::TaskThread () {/*{{{*/

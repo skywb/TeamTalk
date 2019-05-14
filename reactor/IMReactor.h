@@ -4,6 +4,7 @@
 
 #include <queue>
 #include <mutex>
+#include <thread>
 #include <vector>
 #include <map>
 #include <functional>
@@ -11,6 +12,9 @@
 #include <sys/epoll.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include <condition_variable>
+
+#include <boost/noncopyable.hpp>
 
 #include "reactor/Connecter.h"
 #include <reactor/task.h>
@@ -50,6 +54,51 @@ namespace IM {
 
 
 
+	class ThreadPool  : public boost::noncopyable
+	{
+	public:
+		ThreadPool (size_t num = 10);
+		virtual ~ThreadPool ();
+
+		//开始所有线程, 等待任务
+		void start();
+
+		//停止所有线程, 不再接收任务
+		void stop();
+
+		//添加一个task， 同时唤醒一个线程(如果有等待线程的话，否则放到等待队列中)
+		bool addTask(std::shared_ptr<Task> task);
+		//从队列中获取一个task
+		std::shared_ptr<Task> getTask();
+
+		//size_t size() { return taskQue.size(); }
+
+
+		//扩展线程池大小
+		bool addThreadsToPool(size_t num);
+		//缩减线程池大小
+		bool reducedThreadsFromPool(size_t num);
+	
+	private:
+		static void callBack_threadPool(ThreadPool* p);
+
+		//条件变量锁
+		std::mutex  m_mutex;
+		//task条件变量
+		std::condition_variable m_cond;
+
+		//保存所有线程状态
+		std::vector<std::shared_ptr<std::thread>> threads;
+
+		size_t thread_num;
+
+		//true表示线程已经运行
+		bool m_started;
+
+		//等待队列
+		std::queue<std::shared_ptr<Task>> taskQue;
+
+	};
 
 	/*
 	 * 任务工作线程， 其中callBack是线程回调函数
