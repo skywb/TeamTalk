@@ -13,6 +13,7 @@ add_executable(ProtocolClient ProtocolClient.cpp)
 #add_executable(testUserDao_select testUserDao_select.cpp)
 #add_executable(testUserDao_del testUserDao_del.cpp)
 #add_executable(testUserDao_update testUserDao_update.cpp)
+add_executable(ThreadPool testThreadPool.cpp)
 
 
 
@@ -24,6 +25,7 @@ target_link_libraries(ProtocolClient IM Util Reactor dao mysqlcppconn pthread)
 #target_link_libraries(testUserDao_select dao IM Util Reactor mysqlcppconn gtest gtest_main pthread )
 #target_link_libraries(testUserDao_del dao IM Util Reactor mysqlcppconn gtest gtest_main pthread )
 #target_link_libraries(testUserDao_update dao IM Util Reactor mysqlcppconn gtest gtest_main pthread )
+target_link_libraries(ThreadPool Reactor IM Util dao mysqlcppconn pthread)
 
 
 

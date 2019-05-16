@@ -2,6 +2,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <functional>
+#include <cstdio>
 
 
 #include "reactor/IMReactor.h"
@@ -15,11 +16,17 @@ IMReactor* IMReactor::_thisReactor = nullptr;
 
 
 void ThreadPool::callBack_threadPool(ThreadPool* p) {
+	std::cout << "callBack fun is started" << std::endl;
 	while(true) {
 		auto task = p->getTask();
 		if(task == nullptr) break;
+		std::cout << "yes" << std::endl;
+		char msg[100];
+		sprintf(msg, "Thread %lu getTask", ::pthread_self());
+		Log::log(Log::INFO, msg);
 		task->doit();
 	}
+	std::cout << "finish" << std::endl;
 }
 
 
@@ -73,11 +80,10 @@ bool ThreadPool::addTask(std::shared_ptr<Task> task) {
 std::shared_ptr<Task> ThreadPool::getTask() {
 	std::unique_lock<std::mutex> lock(m_mutex);
 
-	while(taskQue.empty() || m_started ) {
+	while(taskQue.empty() && m_started) {
 		m_cond.wait(lock);
 	}
 
-	Log::log(Log::INFO, "thread getTask");
 	if(m_started && !taskQue.empty()) {
 		auto res = taskQue.front();
 		taskQue.pop();
