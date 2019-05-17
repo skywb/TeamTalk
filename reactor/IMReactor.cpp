@@ -16,17 +16,14 @@ IMReactor* IMReactor::_thisReactor = nullptr;
 
 
 void ThreadPool::callBack_threadPool(ThreadPool* p) {
-	std::cout << "callBack fun is started" << std::endl;
 	while(true) {
 		auto task = p->getTask();
 		if(task == nullptr) break;
-		std::cout << "yes" << std::endl;
 		char msg[100];
 		sprintf(msg, "Thread %lu getTask", ::pthread_self());
 		Log::log(Log::INFO, msg);
 		task->doit();
 	}
-	std::cout << "finish" << std::endl;
 }
 
 
@@ -324,6 +321,13 @@ void IMReactor::eventAdd(Event event) {
 	std::lock_guard<std::mutex> lock(que_mutex);
 	que.push(event);
 }
+
+
+
+void IMReactor::addTask(std::shared_ptr<Task> task) { 
+	threads.addTask(task);
+}
+
 
 //std::shared_ptr<TaskThread> IMReactor::getIdelThread() {
 //	if(idelTaskNum > 0) {

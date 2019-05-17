@@ -8,7 +8,7 @@
 class MyTask : public Task
 {
 public:
-	MyTask() :   Task(std::make_shared<Connecter>  (10))  { }
+	MyTask() : Task()  { }
 	virtual ~MyTask () {}
 
 	void doit() {

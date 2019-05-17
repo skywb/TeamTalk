@@ -12,23 +12,33 @@ using namespace IM;
  */
 class Task {
 	public:
-		Task(std::shared_ptr<Connecter> connecter_ptr) : 
-			p_con(connecter_ptr) { }
+		Task() {}
 
-		virtual void doit();
+		virtual void doit() = 0;
 
 		~Task() { }
-	protected:
-		std::shared_ptr<Connecter> p_con;
+};
+
+class IMTask : public Task
+{
+public:
+	IMTask (std::shared_ptr<Connecter> connecter_ptr) :
+		p_con(connecter_ptr) { }
+	virtual ~IMTask () { }
+
+	void doit() override = 0;
+
+protected:
+	std::shared_ptr<Connecter> p_con;
 };
 
 
 
-class WriteableTask : public Task
+class WriteableTask : public IMTask
 {
 	public:
 		WriteableTask (std::shared_ptr<Connecter> connecter_ptr) : 
-			Task(connecter_ptr) { }
+			IMTask(connecter_ptr) { }
 
 		virtual ~WriteableTask () { }
 
@@ -36,11 +46,11 @@ class WriteableTask : public Task
 
 };
 
-class ReadableTask : public Task
+class ReadableTask : public IMTask
 {
 	public:
 		ReadableTask (std::shared_ptr<Connecter> connecter_ptr) : 
-			Task(connecter_ptr) { }
+			IMTask(connecter_ptr) { }
 
 		virtual ~ReadableTask () { }
 
@@ -48,11 +58,11 @@ class ReadableTask : public Task
 
 };
 
-class NewConnectTask : public Task
+class NewConnectTask : public IMTask
 {
 	public:
 		NewConnectTask (std::shared_ptr<Connecter> connecter_ptr) : 
-			Task(connecter_ptr) { }
+			IMTask(connecter_ptr) { }
 
 		virtual ~NewConnectTask () { }
 
@@ -60,18 +70,21 @@ class NewConnectTask : public Task
 
 };
 
-class LoginTask : public Task
+class LoginTask : public IMTask
 {
 public:
-	LoginTask ();
-	virtual ~LoginTask ();
+	LoginTask (std::shared_ptr<IM::LoginPdu> user_p, 
+			std::shared_ptr<Connecter> connecter_ptr) : 
+		IMTask(connecter_ptr),
+		userPdu(user_p) { }
+	virtual ~LoginTask () { }
 
 	void doit() override ;
 
 private:
-	std::shared_ptr<IM::LoginPdu> user;
-	std::shared_ptr<Connecter> con;
+	std::shared_ptr<IM::LoginPdu> userPdu;
 };
+
 
 
 #endif /* end of include guard: TASK_H_TKQEYUJB */

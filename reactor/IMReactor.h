@@ -145,6 +145,7 @@ namespace IM {
 
 		//std::shared_ptr<TaskThread> getIdelThread();
 
+		void addTask(std::shared_ptr<Task> task);
 
 		void loop();
 
