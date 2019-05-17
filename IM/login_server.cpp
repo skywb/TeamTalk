@@ -60,17 +60,21 @@ void login_server(std::shared_ptr<IM::LoginPdu> pdu, std::shared_ptr<IM::Connect
 
 	//账号不存在
 	if(dbUser == nullptr) {
-		std::cout << "账号不存在" << std::endl;
+		//std::cout << "账号不存在" << std::endl;
+		p_con->send("账号不存在");
+		return ;
 	}
 	//登录成功
 	if(user.getPassword() == dbUser->getPassword()) {
 
-		std::cout << "登录成功" << std::endl;
+		//std::cout << "登录成功" << std::endl;
+		p_con->send("登录成功");
 		ConnMap::addAccount(std::make_pair(user.getId(), p_con));
 
 	} else { //密码错误
 
-		std::cout << "密码错误" << std::endl;
+		//std::cout << "密码错误" << std::endl;
+		p_con->send("密码错误");
    	}
 
 	/* TODO: 

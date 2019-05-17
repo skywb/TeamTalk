@@ -100,30 +100,30 @@ namespace IM {
 
 	};
 
-	/*
-	 * 任务工作线程， 其中callBack是线程回调函数
-	 */
-	class TaskThread
-	{
-	public:
-		//typedef  epoll_event Event;
-		typedef void* (*callBack) (void *);
-		TaskThread ();
-		virtual ~TaskThread ();
+	///*
+	// * 任务工作线程， 其中callBack是线程回调函数
+	// */
+	//class TaskThread
+	//{
+	//public:
+	//	//typedef  epoll_event Event;
+	//	typedef void* (*callBack) (void *);
+	//	TaskThread ();
+	//	virtual ~TaskThread ();
 
-		std::shared_ptr<Task> getTask();
-		void addTask(std::shared_ptr<Task> task);
+	//	std::shared_ptr<Task> getTask();
+	//	void addTask(std::shared_ptr<Task> task);
 
-		int getTaskCount() { return Tasks.size(); }
-		void join(callBack callBack_fun, void* arg);
-	
-	private:
-		pthread_t pid;
-		pthread_cond_t cond;
-		pthread_mutex_t _mutex;
-		//std::mutex  _mutex;
-		std::queue<std::shared_ptr<Task>> Tasks;
-	};
+	//	int getTaskCount() { return Tasks.size(); }
+	//	void join(callBack callBack_fun, void* arg);
+	//
+	//private:
+	//	pthread_t pid;
+	//	pthread_cond_t cond;
+	//	pthread_mutex_t _mutex;
+	//	//std::mutex  _mutex;
+	//	std::queue<std::shared_ptr<Task>> Tasks;
+	//};
 
 	class IMReactor
 	{/*{{{*/
@@ -143,7 +143,7 @@ namespace IM {
 
 		void eventAdd(Event event);
 
-		std::shared_ptr<TaskThread> getIdelThread();
+		//std::shared_ptr<TaskThread> getIdelThread();
 
 
 		void loop();
@@ -165,13 +165,14 @@ namespace IM {
 		std::mutex que_mutex;
 
 		//std::vector<epoll_event> events;
-		std::vector<std::shared_ptr<TaskThread>> threads;
+		//std::vector<std::shared_ptr<TaskThread>> threads;
+		ThreadPool threads;
 		std::map<int, std::shared_ptr<Connecter>> sockToConn;
 
 		static IMReactor* _thisReactor;
 	};/*}}}*/
 
-	void* IMTaskCallBack (void* arg);
+	//void* IMTaskCallBack (void* arg);
 
 
 }

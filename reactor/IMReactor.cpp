@@ -105,41 +105,41 @@ bool ThreadPool::reducedThreadsFromPool(size_t num) {
 }
 
 
-TaskThread::TaskThread () {/*{{{*/
-	pthread_mutex_init(&_mutex, NULL);
-	pthread_cond_init(&cond, NULL);
-}/*}}}*/
-
-void TaskThread::join(callBack callBack_fun, void* arg) {
-
-	::pthread_create(&pid, NULL, callBack_fun, arg);
-}
-
-TaskThread::~TaskThread () {
-}
-
-
-void TaskThread::addTask(std::shared_ptr<Task> task) {
-
-	pthread_mutex_lock(&_mutex);
-	Tasks.push(task);
-	::pthread_cond_signal(&cond);
-	pthread_mutex_unlock(&_mutex);
-}
-
-
+//TaskThread::TaskThread () {/*{{{*/
+//	pthread_mutex_init(&_mutex, NULL);
+//	pthread_cond_init(&cond, NULL);
+//}/*}}}*/
+//
+//void TaskThread::join(callBack callBack_fun, void* arg) {
+//
+//	::pthread_create(&pid, NULL, callBack_fun, arg);
+//}
+//
+//TaskThread::~TaskThread () {
+//}
+//
+//
+//void TaskThread::addTask(std::shared_ptr<Task> task) {
+//
+//	pthread_mutex_lock(&_mutex);
+//	Tasks.push(task);
+//	::pthread_cond_signal(&cond);
+//	pthread_mutex_unlock(&_mutex);
+//}
 
 
 
-std::shared_ptr<Task> TaskThread::getTask() {/*{{{*/
-	//std::lock_guard<pthread_mutex_t> lock(_mutex);
-	pthread_mutex_lock(&_mutex);
-	pthread_cond_wait(&cond, &_mutex);
-	auto p = Tasks.front();
-	Tasks.pop();
-	pthread_mutex_unlock(&_mutex);
-	return p;
-}/*}}}*/
+
+
+//std::shared_ptr<Task> TaskThread::getTask() {/*{{{*/
+//	//std::lock_guard<pthread_mutex_t> lock(_mutex);
+//	pthread_mutex_lock(&_mutex);
+//	pthread_cond_wait(&cond, &_mutex);
+//	auto p = Tasks.front();
+//	Tasks.pop();
+//	pthread_mutex_unlock(&_mutex);
+//	return p;
+//}/*}}}*/
 
 
 
@@ -150,12 +150,17 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 	idelTaskIndex = 0;
 
 	//启动十个任务线程
-	for(int i=0; i<10; ++i)
-	{
-		TaskThread* p = new TaskThread();
-		threads.push_back(std::shared_ptr<TaskThread> (p));
-		threads[i]->join(IMTaskCallBack, (void*)p);
-	}
+	//for(int i=0; i<10; ++i)
+	//{
+	//	TaskThread* p = new TaskThread();
+	//	threads.push_back(std::shared_ptr<TaskThread> (p));
+	//	threads[i]->join(IMTaskCallBack, (void*)p);
+	//}
+
+
+	//启动线程池
+	threads.start();
+
 
 	sockaddr_in addr;
 	if(IP == NULL) {
@@ -281,8 +286,9 @@ void IMReactor::loop() {/*{{{*/
 					 */
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<ReadableTask> (connecter);
-					auto taskThread = getIdelThread();
-					taskThread->addTask(task);
+					threads.addTask(task);
+					//auto taskThread = getIdelThread();
+					//taskThread->addTask(task);
 					
 				} else {
 					//可写
@@ -294,8 +300,9 @@ void IMReactor::loop() {/*{{{*/
 					 */
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<WriteableTask> (connecter);
-					auto taskThread = getIdelThread();
-					taskThread->addTask(task);
+					threads.addTask(task);
+					//auto taskThread = getIdelThread();
+					//taskThread->addTask(task);
 				}
 
 			}
@@ -318,37 +325,37 @@ void IMReactor::eventAdd(Event event) {
 	que.push(event);
 }
 
-std::shared_ptr<TaskThread> IMReactor::getIdelThread() {
-	if(idelTaskNum > 0) {
-		--idelTaskNum;
-		return threads[idelTaskIndex];
-	} else {
+//std::shared_ptr<TaskThread> IMReactor::getIdelThread() {
+//	if(idelTaskNum > 0) {
+//		--idelTaskNum;
+//		return threads[idelTaskIndex];
+//	} else {
+//
+//		/* TODO: 
+//		 *
+//		 * 负载均衡， 临时使用下一个线程
+//		 * <20-04-19, sky> */
+//
+//		idelTaskNum = 10;
+//		++idelTaskIndex;
+//		idelTaskIndex %= threads.size();
+//		return threads[idelTaskIndex];
+//	}
+//	
+//}
 
-		/* TODO: 
-		 *
-		 * 负载均衡， 临时使用下一个线程
-		 * <20-04-19, sky> */
-
-		idelTaskNum = 10;
-		++idelTaskIndex;
-		idelTaskIndex %= threads.size();
-		return threads[idelTaskIndex];
-	}
-	
-}
 
 
-
-void* IM::IMTaskCallBack (void *arg) { /*{{{*/
-
-	if(arg == nullptr) return nullptr;
-	TaskThread* taskTread = (TaskThread*)arg;
-	Log::log(Log::INFO, "IMTask线程启动成功！");
-	while(true)
-	{
-		auto task = taskTread->getTask();
-		task->doit();
-	}
-
-}/*}}}*/
+//void* IM::IMTaskCallBack (void *arg) { /*{{{*/
+//
+//	if(arg == nullptr) return nullptr;
+//	TaskThread* taskTread = (TaskThread*)arg;
+//	Log::log(Log::INFO, "IMTask线程启动成功！");
+//	while(true)
+//	{
+//		auto task = taskTread->getTask();
+//		task->doit();
+//	}
+//
+//}/*}}}*/
 
