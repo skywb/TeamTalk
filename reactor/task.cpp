@@ -69,6 +69,9 @@ void LoginTask::doit() {
 
 	auto userConn = ConnMap::findConnecterById(user.getId());
 	if(userConn != nullptr) {
+		/* TODO: 
+		 * 顶掉线
+		 * <17-05-19, sky> */
 		std::cout << "用户已在线" << std::endl;
 		return ;
 	}
