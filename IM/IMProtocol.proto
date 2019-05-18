@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+//登录请求
+message Request_login {
+	uint64 ID = 1;
+	string password = 2;
+	// Next available id: 1
+}
+
+//登录应答
+message Response_login {
+	
+	// 是否登录成功
+	enum STAT {
+		SUCCESS        = 0;
+		ACCOUNT_NULL   = 1;
+		ACCOUNT_LOCK   = 2;
+		PASSWORD_ERROR = 3;
+		ERROR		   = 10;
+	}
+
+	STAT stat = 1;
+	// Next available id: 1
+}
+
+//请求登出
+message Request_logout {
+	uint64 ID = 1;
+	// Next available id: 1
+}
+
+//请求发送消息
+message Request_sendmsg {
+	uint64 ID = 1; //自己的ID
+	uint64 objID = 2; //对方的ID
+	string msg = 3;
+
+	// Next available id: 1
+}
+

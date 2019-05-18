@@ -265,6 +265,17 @@ void SendMsgPdu::setBodyMsg(const std::string msg, size_t len) {
 }
 
 
+ResponseLoginPdu::ResponseLoginPdu (const char* buf, size_t len) {
+	command = RESPONSE_LOGIN;
+
+}
+ResponseLoginPdu::~ResponseLoginPdu () {
+
+}
+
+size_t ResponseLoginPdu::serialization (char* buf) {
+
+}
 
 
 

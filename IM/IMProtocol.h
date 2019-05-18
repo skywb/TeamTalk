@@ -18,6 +18,12 @@ enum IMPduCMD {
 
 	SENDMSG, 
 
+
+	//响应
+	RESPONSE_LOGIN,
+
+
+
 	INVALID
 };
 
@@ -126,6 +132,32 @@ private:
 	char m_msg[MSG_MAX_LENGTH];
 
 };
+
+class ResponseLoginPdu : public IMPdu
+{
+public:
+	enum STAT {
+		SUCCEED,
+		FAILD
+		};
+
+	ResponseLoginPdu () : m_stat(SUCCEED){
+		command = RESPONSE_LOGIN;
+   	}
+	ResponseLoginPdu (STAT stat, const std::string msg) : m_stat(stat), m_msg(msg){
+		command = RESPONSE_LOGIN;
+   	}
+	ResponseLoginPdu (const char* buf, size_t len); 
+	virtual ~ResponseLoginPdu ();
+	
+	size_t serialization (char* buf) override;
+
+
+protected:
+	STAT m_stat;
+	std::string m_msg;
+};
+
 
 
 
