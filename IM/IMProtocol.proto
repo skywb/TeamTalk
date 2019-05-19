@@ -1,8 +1,45 @@
 syntax = "proto3";
 
+// 
+message Request {
+
+	// 包类型
+	enum Type {
+		LOGIN	= 0;
+		LOGOUT	= 1;
+		SENDMSG = 2;
+	}
+	Type type = 1;
+	oneof pdu {
+		Request_login	request_login	= 11;
+		Request_logout	request_logout	= 12;
+		Request_sendmsg request_sendmsg	= 13;
+	}
+}
+
+// 服务端对客户端的响应
+message Response {
+	
+	// 类型
+	enum Type {
+		LOGIN	= 0;
+		LOGOUT	= 1;
+		SENDMSG = 2;
+	}
+
+	Type type = 1;
+	oneof pdu {
+		Response_login	response_login		= 11;
+		//Response_logout	response_logout	= 12;
+		Response_sendmsg response_sendmsg	= 13;
+	}
+}
+
+
+
 //登录请求
 message Request_login {
-	uint64 ID = 1;
+	uint64 ID		= 1;
 	string password = 2;
 	// Next available id: 1
 }
@@ -23,18 +60,33 @@ message Response_login {
 	// Next available id: 1
 }
 
-//请求登出
+//登出请求
 message Request_logout {
 	uint64 ID = 1;
 	// Next available id: 1
 }
 
-//请求发送消息
-message Request_sendmsg {
-	uint64 ID = 1; //自己的ID
-	uint64 objID = 2; //对方的ID
-	string msg = 3;
+////登出应答
+//message Response_logout {
+//	uint64 ID = 1;
+//	// Next available id: 1
+//}
 
+
+//请求发送消
+message Request_sendmsg {
+	uint32 msgID	= 1; //消息ID
+	uint64 ID		= 2; //自己的ID
+	uint64 objID	= 3; //对方的ID
+	string msg		= 4;
+
+	// Next available id: 1
+}
+
+//请求发送消
+message Response_sendmsg {
+	uint32 msgID	= 1;
+	bool stat		= 2;
 	// Next available id: 1
 }
 
