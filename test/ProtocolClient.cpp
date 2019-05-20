@@ -59,15 +59,20 @@ int main()
 				continue;
 				break;
 		}
+
 		int len = IM::IMPduToSerivlization(buf, pdu);
 		std::cout << pdu->getHeaderLenth() << std::endl;
 		int re  =  write(fd, buf, len);
-		int readLen = read(fd, buf, BUFSIZ);
 		if(re == -1) {
 			std::cout << strerror(errno) << std::endl;
 		}  else   std::cout << "write " << re << "Byte" << std::endl;
+
+		sleep(2);
+		int readLen = read(fd, buf, BUFSIZ);
+		std::cout << "read " << readLen << "Byte" << std::endl;
 		if(readLen > 0) 
 			std::cout << "recive msg: " <<  buf << std::endl;
+
 	}
 	return 0;
 }

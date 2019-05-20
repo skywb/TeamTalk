@@ -6,3 +6,13 @@
 command! Todo Ack! 'TODO|FIXME|CHANGED|BUG|HACK'
 
 let PROJECT_HOME = $PWD
+
+
+func! Debug()
+     exec "packadd termdebug"
+     exec "let g:termdebug_wide = 163"
+     exec "Termdebug"
+ endfunc
+
+
+

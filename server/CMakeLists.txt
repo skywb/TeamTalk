@@ -5,12 +5,9 @@ aux_source_directory(. DIR_LIB_SRCS)
 
 
 
-#add_library(IM ${DIR_LIB_SRCS})
 
-add_library(IM SHARED ${DIR_LIB_SRCS})
-target_link_libraries(IM protobuf)
-
-
+add_library(server SHARED ${DIR_LIB_SRCS})
+#target_link_libraries(server)
 
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 

@@ -19,6 +19,7 @@ add_subdirectory(IM)
 add_subdirectory(reactor)
 add_subdirectory(util)
 add_subdirectory(dao)
+add_subdirectory(server)
 add_subdirectory(test)
 
 

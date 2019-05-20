@@ -7,13 +7,13 @@
 #include <unistd.h>
 #include <vector>
 
-#include "IM/IMProtocol.h"
+#include "IM/IMProtocol.pb.h"
 
 
 class User
 {
 public:
-	typedef unsigned int Account;
+	typedef uint64_t Account;
 
 	User (Account id = 0) : id(id){ }
 	virtual ~User () { }

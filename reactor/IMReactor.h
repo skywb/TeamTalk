@@ -133,7 +133,7 @@ namespace IM {
 		static IMReactor* getInstances();
 		static IMReactor* IMReactorInit(const char* IP, uint16_t port);
 		static void optEventListen (Event event);
-		std::shared_ptr<Connecter> getConnecter(int sockfd) {
+		std::shared_ptr<IMConn> getConnecter(int sockfd) {
 			return sockToConn[sockfd];	
 		}
 		void delConnecter(int sockfd) {
@@ -168,7 +168,7 @@ namespace IM {
 		//std::vector<epoll_event> events;
 		//std::vector<std::shared_ptr<TaskThread>> threads;
 		ThreadPool threads;
-		std::map<int, std::shared_ptr<Connecter>> sockToConn;
+		std::map<int, std::shared_ptr<IMConn>> sockToConn;
 
 		static IMReactor* _thisReactor;
 	};/*}}}*/

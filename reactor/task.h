@@ -2,7 +2,7 @@
 #define TASK_H_TKQEYUJB
 
 #include "reactor/Connecter.h"
-#include "IM/IMProtocol.h"
+#include "IM/IMProtocol.pb.h"
 
 using namespace IM;
 /*
@@ -22,14 +22,14 @@ class Task {
 class IMTask : public Task
 {
 public:
-	IMTask (std::shared_ptr<Connecter> connecter_ptr) :
+	IMTask (std::shared_ptr<IMConn> connecter_ptr) :
 		p_con(connecter_ptr) { }
 	virtual ~IMTask () { }
 
 	void doit() override = 0;
 
 protected:
-	std::shared_ptr<Connecter> p_con;
+	std::shared_ptr<IMConn> p_con;
 };
 
 
@@ -37,7 +37,7 @@ protected:
 class WriteableTask : public IMTask
 {
 	public:
-		WriteableTask (std::shared_ptr<Connecter> connecter_ptr) : 
+		WriteableTask (std::shared_ptr<IMConn> connecter_ptr) : 
 			IMTask(connecter_ptr) { }
 
 		virtual ~WriteableTask () { }
@@ -49,7 +49,7 @@ class WriteableTask : public IMTask
 class ReadableTask : public IMTask
 {
 	public:
-		ReadableTask (std::shared_ptr<Connecter> connecter_ptr) : 
+		ReadableTask (std::shared_ptr<IMConn> connecter_ptr) : 
 			IMTask(connecter_ptr) { }
 
 		virtual ~ReadableTask () { }
@@ -61,7 +61,7 @@ class ReadableTask : public IMTask
 class NewConnectTask : public IMTask
 {
 	public:
-		NewConnectTask (std::shared_ptr<Connecter> connecter_ptr) : 
+		NewConnectTask (std::shared_ptr<IMConn> connecter_ptr) : 
 			IMTask(connecter_ptr) { }
 
 		virtual ~NewConnectTask () { }
@@ -70,11 +70,12 @@ class NewConnectTask : public IMTask
 
 };
 
+/*
 class LoginTask : public IMTask
 {
 public:
 	LoginTask (std::shared_ptr<IM::LoginPdu> user_p, 
-			std::shared_ptr<Connecter> connecter_ptr) : 
+			std::shared_ptr<IMConn> connecter_ptr) : 
 		IMTask(connecter_ptr),
 		userPdu(user_p) { }
 	virtual ~LoginTask () { }
@@ -85,6 +86,6 @@ private:
 	std::shared_ptr<IM::LoginPdu> userPdu;
 };
 
-
+*/
 
 #endif /* end of include guard: TASK_H_TKQEYUJB */

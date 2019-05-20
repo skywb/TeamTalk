@@ -11,6 +11,7 @@
 
 #include "reactor/Addresser.h"
 #include "util/sockUtil.h"
+#include "IM/IMProtocol.pb.h"
 
 
 namespace IM {
@@ -18,18 +19,17 @@ namespace IM {
 	/* 数据缓冲区， 可以暂存数据
 	 */
 
-	class Buffer
-	{
+	class Buffer {/*{{{*/
 	public:
 		Buffer () :  _begin(0), buf(nullptr), _end(0) {}
-		Buffer (const char* str) {
-			_end = strlen(str);
+		Buffer (const char* str, size_t len) {
+			_end = len;
 			if(_end > MSGMAXSIZE) {
 				//log(error);
 				buf = nullptr;
 			} else {
 				buf = new char[MSGMAXSIZE];
-				::strncpy(buf, str, _end);
+				::memcpy(buf, str, _end);
 			}
 		}
 		~Buffer () {
@@ -52,10 +52,9 @@ namespace IM {
 		size_t _begin;
 		char * buf;
 		size_t _end;
-	};
+	};/*}}}*/
 
-	class TryReciveException : public std::exception
-	{
+	class TryReciveException : public std::exception {/*{{{*/
 	public:
 		TryReciveException (const char* msg) :msg(msg) {}
 		virtual ~TryReciveException () {}
@@ -66,19 +65,16 @@ namespace IM {
 	
 	private:
 		const char* msg;
-	};
+	};/*}}}*/
 
 
-	class Connecter
-	{
+	class Connecter {
 	public:
 		Connecter(int _sockfd) : 
 			sockfd(_sockfd), readable(true), writeable(true),
-		   	TryReciving(false), readBufbeg(0),
-			readBufend(0), writeBufHaveData(false), readBufMaxLenth(BUFSIZ*2)
+		   	readBufbeg(0), readBufend(0), writeBufHaveData(false), readBufMaxLenth(BUFSIZ*2)
 		{
 			readBuf = (char*)::malloc(BUFSIZ*2);
-			::pthread_mutex_init(&mutex, nullptr);
 		}
 
 		virtual ~Connecter() {
@@ -87,25 +83,12 @@ namespace IM {
 		}
 
 
-		//virtual void closeRead();
-
-		//virtual void closeWrite();
-
 		//读取数据
+		virtual int send(const char* msg, size_t len);
 		virtual int recive(char* buf, size_t minLength = 0);
 
-		/* 尝试读取
-		 * 若数据不符合要求，通过rollback_tryRecive()使数据回到缓冲区，变为未读状态
-		 * 若符合要求，调用commit_tryRecive()提交已读取内容
-		 */
-		virtual bool startTryRecive(size_t minLength = 0, size_t maxLength = BUFSIZ);
-		virtual int tryRecive(char* buf, size_t length = 0);
-		//确认读取内容
-		virtual bool commit_tryRecive();
-		//回滚数据，使tryRecive读取的数据回到缓冲区中
-		virtual bool rollback_tryRecive();
-		//发送数据
-		virtual int send(const char* msg);
+		virtual void readToBuffer();
+
 		virtual void closeThisConnecter();
 		//virtual void deleteThisConnecter();
 
@@ -113,22 +96,20 @@ namespace IM {
 		virtual bool onWriteable();
 
 		virtual bool isConnected() {
-			::pthread_mutex_lock(&mutex);
+			std::lock_guard<std::mutex> lock(m_mutex);
 			bool stat = writeable | readable;
-			::pthread_mutex_unlock(&mutex);
 			return stat; 
 		}
 	
 	protected:
+
 		//正在连接的socket
 		int sockfd;
-		//是否是一个可用的连接
-		//bool connected;
 		bool readable;
 		bool writeable;
 
 		//是否已经startRevive
-		bool TryReciving;
+		//bool TryReciving;
 
 		/* 读缓冲的开始位置，一般为0
 		 * 当开始了tryRecive之后才会变动
@@ -145,9 +126,34 @@ namespace IM {
 		//写缓冲
 		std::queue<Buffer> writeBuf;
 		//锁
-		::pthread_mutex_t mutex;
+		//::pthread_mutex_t mutex;
+		std::mutex m_mutex;
 	};
 
+
+
+
+	class IMConn : public Connecter
+	{
+	public:
+		IMConn (int sockfd) : Connecter(sockfd) { }
+		//IMConn (const char* IP, const uint16_t port);
+		virtual ~IMConn () {}
+
+		bool send(Proto::Response* response);
+		Proto::Request* recive();
+	};
+
+	class ClientConn : public Connecter
+	{
+	public:
+		ClientConn (int sockfd) : Connecter(sockfd) { }
+		ClientConn (const char* IP, const uint16_t port);
+		virtual ~ClientConn () {}
+
+		bool send(Proto::Request* request);
+		Proto::Response* recive();
+	};
 }
 
 #endif /* end of include guard: CONNECTER_H_TCUVAPLY */

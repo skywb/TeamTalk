@@ -229,7 +229,7 @@ void IMReactor::loop() {/*{{{*/
 				event.data.fd = eve.getScoket();
 				epoll_ctl(epoll_root, eve.getOpt(), eve.getScoket(), &event);
 				if(eve.getOpt() == EPOLL_CTL_ADD)
-					sockToConn[eve.getScoket()] = std::make_shared<Connecter> (eve.getScoket());
+					sockToConn[eve.getScoket()] = std::make_shared<IMConn> (eve.getScoket());
 				else if(eve.getOpt() == EPOLL_CTL_DEL) 
 					sockToConn[eve.getScoket()].reset();
 
@@ -268,7 +268,7 @@ void IMReactor::loop() {/*{{{*/
 					int nfd = sockUtil::acceptNewConnect(sock_listen);	
 					sockUtil::setNoBlock(nfd);
 					if(nfd == -1) break;
-					//std::cout << "new sockfd = " << nfd << std::endl;
+					std::cout << "new sockfd = " << nfd << std::endl;
 					IMReactor::optEventListen(Event(EPOLL_CTL_ADD, EPOLLIN, nfd));
 				}
 
@@ -281,6 +281,7 @@ void IMReactor::loop() {/*{{{*/
 					 * 创建Task
 					 * 分配工作线程
 					 */
+					std::cout << "recive msg" << std::endl;
 					auto connecter = getConnecter(cur.data.fd);
 					std::shared_ptr<Task> task = std::make_shared<ReadableTask> (connecter);
 					threads.addTask(task);

@@ -48,13 +48,17 @@ struct TableStruct_IMProtocol_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
   static const ::PROTOBUF_NAMESPACE_ID::uint32 offsets[];
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_IMProtocol_2eproto;
+namespace Proto {
+class Message;
+class MessageDefaultTypeInternal;
+extern MessageDefaultTypeInternal _Message_default_instance_;
 class Request;
 class RequestDefaultTypeInternal;
 extern RequestDefaultTypeInternal _Request_default_instance_;
@@ -76,15 +80,18 @@ extern Response_loginDefaultTypeInternal _Response_login_default_instance_;
 class Response_sendmsg;
 class Response_sendmsgDefaultTypeInternal;
 extern Response_sendmsgDefaultTypeInternal _Response_sendmsg_default_instance_;
+}  // namespace Proto
 PROTOBUF_NAMESPACE_OPEN
-template<> ::Request* Arena::CreateMaybeMessage<::Request>(Arena*);
-template<> ::Request_login* Arena::CreateMaybeMessage<::Request_login>(Arena*);
-template<> ::Request_logout* Arena::CreateMaybeMessage<::Request_logout>(Arena*);
-template<> ::Request_sendmsg* Arena::CreateMaybeMessage<::Request_sendmsg>(Arena*);
-template<> ::Response* Arena::CreateMaybeMessage<::Response>(Arena*);
-template<> ::Response_login* Arena::CreateMaybeMessage<::Response_login>(Arena*);
-template<> ::Response_sendmsg* Arena::CreateMaybeMessage<::Response_sendmsg>(Arena*);
+template<> ::Proto::Message* Arena::CreateMaybeMessage<::Proto::Message>(Arena*);
+template<> ::Proto::Request* Arena::CreateMaybeMessage<::Proto::Request>(Arena*);
+template<> ::Proto::Request_login* Arena::CreateMaybeMessage<::Proto::Request_login>(Arena*);
+template<> ::Proto::Request_logout* Arena::CreateMaybeMessage<::Proto::Request_logout>(Arena*);
+template<> ::Proto::Request_sendmsg* Arena::CreateMaybeMessage<::Proto::Request_sendmsg>(Arena*);
+template<> ::Proto::Response* Arena::CreateMaybeMessage<::Proto::Response>(Arena*);
+template<> ::Proto::Response_login* Arena::CreateMaybeMessage<::Proto::Response_login>(Arena*);
+template<> ::Proto::Response_sendmsg* Arena::CreateMaybeMessage<::Proto::Response_sendmsg>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
+namespace Proto {
 
 enum Request_Type : int {
   Request_Type_LOGIN = 0,
@@ -116,12 +123,13 @@ enum Response_Type : int {
   Response_Type_LOGIN = 0,
   Response_Type_LOGOUT = 1,
   Response_Type_SENDMSG = 2,
+  Response_Type_MESSAGE = 3,
   Response_Type_Response_Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   Response_Type_Response_Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
 bool Response_Type_IsValid(int value);
 constexpr Response_Type Response_Type_Type_MIN = Response_Type_LOGIN;
-constexpr Response_Type Response_Type_Type_MAX = Response_Type_SENDMSG;
+constexpr Response_Type Response_Type_Type_MAX = Response_Type_MESSAGE;
 constexpr int Response_Type_Type_ARRAYSIZE = Response_Type_Type_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Response_Type_descriptor();
@@ -169,7 +177,7 @@ inline bool Response_login_STAT_Parse(
 // ===================================================================
 
 class Request :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Request) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Request) */ {
  public:
   Request();
   virtual ~Request();
@@ -260,7 +268,7 @@ class Request :
   void InternalSwap(Request* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Request";
+    return "Proto.Request";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -316,42 +324,42 @@ class Request :
 
   // accessors -------------------------------------------------------
 
-  // .Request.Type type = 1;
+  // .Proto.Request.Type type = 1;
   void clear_type();
   static const int kTypeFieldNumber = 1;
-  ::Request_Type type() const;
-  void set_type(::Request_Type value);
+  ::Proto::Request_Type type() const;
+  void set_type(::Proto::Request_Type value);
 
-  // .Request_login request_login = 11;
+  // .Proto.Request_login request_login = 11;
   bool has_request_login() const;
   void clear_request_login();
   static const int kRequestLoginFieldNumber = 11;
-  const ::Request_login& request_login() const;
-  ::Request_login* release_request_login();
-  ::Request_login* mutable_request_login();
-  void set_allocated_request_login(::Request_login* request_login);
+  const ::Proto::Request_login& request_login() const;
+  ::Proto::Request_login* release_request_login();
+  ::Proto::Request_login* mutable_request_login();
+  void set_allocated_request_login(::Proto::Request_login* request_login);
 
-  // .Request_logout request_logout = 12;
+  // .Proto.Request_logout request_logout = 12;
   bool has_request_logout() const;
   void clear_request_logout();
   static const int kRequestLogoutFieldNumber = 12;
-  const ::Request_logout& request_logout() const;
-  ::Request_logout* release_request_logout();
-  ::Request_logout* mutable_request_logout();
-  void set_allocated_request_logout(::Request_logout* request_logout);
+  const ::Proto::Request_logout& request_logout() const;
+  ::Proto::Request_logout* release_request_logout();
+  ::Proto::Request_logout* mutable_request_logout();
+  void set_allocated_request_logout(::Proto::Request_logout* request_logout);
 
-  // .Request_sendmsg request_sendmsg = 13;
+  // .Proto.Request_sendmsg request_sendmsg = 13;
   bool has_request_sendmsg() const;
   void clear_request_sendmsg();
   static const int kRequestSendmsgFieldNumber = 13;
-  const ::Request_sendmsg& request_sendmsg() const;
-  ::Request_sendmsg* release_request_sendmsg();
-  ::Request_sendmsg* mutable_request_sendmsg();
-  void set_allocated_request_sendmsg(::Request_sendmsg* request_sendmsg);
+  const ::Proto::Request_sendmsg& request_sendmsg() const;
+  ::Proto::Request_sendmsg* release_request_sendmsg();
+  ::Proto::Request_sendmsg* mutable_request_sendmsg();
+  void set_allocated_request_sendmsg(::Proto::Request_sendmsg* request_sendmsg);
 
   void clear_pdu();
   PduCase pdu_case() const;
-  // @@protoc_insertion_point(class_scope:Request)
+  // @@protoc_insertion_point(class_scope:Proto.Request)
  private:
   class HasBitSetters;
   void set_has_request_login();
@@ -365,9 +373,9 @@ class Request :
   int type_;
   union PduUnion {
     PduUnion() {}
-    ::Request_login* request_login_;
-    ::Request_logout* request_logout_;
-    ::Request_sendmsg* request_sendmsg_;
+    ::Proto::Request_login* request_login_;
+    ::Proto::Request_logout* request_logout_;
+    ::Proto::Request_sendmsg* request_sendmsg_;
   } pdu_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -377,7 +385,7 @@ class Request :
 // -------------------------------------------------------------------
 
 class Response :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Response) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Response) */ {
  public:
   Response();
   virtual ~Response();
@@ -415,6 +423,7 @@ class Response :
   enum PduCase {
     kResponseLogin = 11,
     kResponseSendmsg = 13,
+    kMsg = 14,
     PDU_NOT_SET = 0,
   };
 
@@ -467,7 +476,7 @@ class Response :
   void InternalSwap(Response* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Response";
+    return "Proto.Response";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -496,6 +505,8 @@ class Response :
     Response_Type_LOGOUT;
   static constexpr Type SENDMSG =
     Response_Type_SENDMSG;
+  static constexpr Type MESSAGE =
+    Response_Type_MESSAGE;
   static inline bool Type_IsValid(int value) {
     return Response_Type_IsValid(value);
   }
@@ -523,37 +534,47 @@ class Response :
 
   // accessors -------------------------------------------------------
 
-  // .Response.Type type = 1;
+  // .Proto.Response.Type type = 1;
   void clear_type();
   static const int kTypeFieldNumber = 1;
-  ::Response_Type type() const;
-  void set_type(::Response_Type value);
+  ::Proto::Response_Type type() const;
+  void set_type(::Proto::Response_Type value);
 
-  // .Response_login response_login = 11;
+  // .Proto.Response_login response_login = 11;
   bool has_response_login() const;
   void clear_response_login();
   static const int kResponseLoginFieldNumber = 11;
-  const ::Response_login& response_login() const;
-  ::Response_login* release_response_login();
-  ::Response_login* mutable_response_login();
-  void set_allocated_response_login(::Response_login* response_login);
+  const ::Proto::Response_login& response_login() const;
+  ::Proto::Response_login* release_response_login();
+  ::Proto::Response_login* mutable_response_login();
+  void set_allocated_response_login(::Proto::Response_login* response_login);
 
-  // .Response_sendmsg response_sendmsg = 13;
+  // .Proto.Response_sendmsg response_sendmsg = 13;
   bool has_response_sendmsg() const;
   void clear_response_sendmsg();
   static const int kResponseSendmsgFieldNumber = 13;
-  const ::Response_sendmsg& response_sendmsg() const;
-  ::Response_sendmsg* release_response_sendmsg();
-  ::Response_sendmsg* mutable_response_sendmsg();
-  void set_allocated_response_sendmsg(::Response_sendmsg* response_sendmsg);
+  const ::Proto::Response_sendmsg& response_sendmsg() const;
+  ::Proto::Response_sendmsg* release_response_sendmsg();
+  ::Proto::Response_sendmsg* mutable_response_sendmsg();
+  void set_allocated_response_sendmsg(::Proto::Response_sendmsg* response_sendmsg);
+
+  // .Proto.Message msg = 14;
+  bool has_msg() const;
+  void clear_msg();
+  static const int kMsgFieldNumber = 14;
+  const ::Proto::Message& msg() const;
+  ::Proto::Message* release_msg();
+  ::Proto::Message* mutable_msg();
+  void set_allocated_msg(::Proto::Message* msg);
 
   void clear_pdu();
   PduCase pdu_case() const;
-  // @@protoc_insertion_point(class_scope:Response)
+  // @@protoc_insertion_point(class_scope:Proto.Response)
  private:
   class HasBitSetters;
   void set_has_response_login();
   void set_has_response_sendmsg();
+  void set_has_msg();
 
   inline bool has_pdu() const;
   inline void clear_has_pdu();
@@ -562,8 +583,9 @@ class Response :
   int type_;
   union PduUnion {
     PduUnion() {}
-    ::Response_login* response_login_;
-    ::Response_sendmsg* response_sendmsg_;
+    ::Proto::Response_login* response_login_;
+    ::Proto::Response_sendmsg* response_sendmsg_;
+    ::Proto::Message* msg_;
   } pdu_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -573,7 +595,7 @@ class Response :
 // -------------------------------------------------------------------
 
 class Request_login :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Request_login) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Request_login) */ {
  public:
   Request_login();
   virtual ~Request_login();
@@ -657,7 +679,7 @@ class Request_login :
   void InternalSwap(Request_login* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Request_login";
+    return "Proto.Request_login";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -699,7 +721,7 @@ class Request_login :
   ::PROTOBUF_NAMESPACE_ID::uint64 id() const;
   void set_id(::PROTOBUF_NAMESPACE_ID::uint64 value);
 
-  // @@protoc_insertion_point(class_scope:Request_login)
+  // @@protoc_insertion_point(class_scope:Proto.Request_login)
  private:
   class HasBitSetters;
 
@@ -712,7 +734,7 @@ class Request_login :
 // -------------------------------------------------------------------
 
 class Response_login :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Response_login) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Response_login) */ {
  public:
   Response_login();
   virtual ~Response_login();
@@ -796,7 +818,7 @@ class Response_login :
   void InternalSwap(Response_login* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Response_login";
+    return "Proto.Response_login";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -856,13 +878,13 @@ class Response_login :
 
   // accessors -------------------------------------------------------
 
-  // .Response_login.STAT stat = 1;
+  // .Proto.Response_login.STAT stat = 1;
   void clear_stat();
   static const int kStatFieldNumber = 1;
-  ::Response_login_STAT stat() const;
-  void set_stat(::Response_login_STAT value);
+  ::Proto::Response_login_STAT stat() const;
+  void set_stat(::Proto::Response_login_STAT value);
 
-  // @@protoc_insertion_point(class_scope:Response_login)
+  // @@protoc_insertion_point(class_scope:Proto.Response_login)
  private:
   class HasBitSetters;
 
@@ -874,7 +896,7 @@ class Response_login :
 // -------------------------------------------------------------------
 
 class Request_logout :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Request_logout) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Request_logout) */ {
  public:
   Request_logout();
   virtual ~Request_logout();
@@ -958,7 +980,7 @@ class Request_logout :
   void InternalSwap(Request_logout* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Request_logout";
+    return "Proto.Request_logout";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -988,7 +1010,7 @@ class Request_logout :
   ::PROTOBUF_NAMESPACE_ID::uint64 id() const;
   void set_id(::PROTOBUF_NAMESPACE_ID::uint64 value);
 
-  // @@protoc_insertion_point(class_scope:Request_logout)
+  // @@protoc_insertion_point(class_scope:Proto.Request_logout)
  private:
   class HasBitSetters;
 
@@ -1000,7 +1022,7 @@ class Request_logout :
 // -------------------------------------------------------------------
 
 class Request_sendmsg :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Request_sendmsg) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Request_sendmsg) */ {
  public:
   Request_sendmsg();
   virtual ~Request_sendmsg();
@@ -1084,7 +1106,7 @@ class Request_sendmsg :
   void InternalSwap(Request_sendmsg* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Request_sendmsg";
+    return "Proto.Request_sendmsg";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -1138,7 +1160,7 @@ class Request_sendmsg :
   ::PROTOBUF_NAMESPACE_ID::uint32 msgid() const;
   void set_msgid(::PROTOBUF_NAMESPACE_ID::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:Request_sendmsg)
+  // @@protoc_insertion_point(class_scope:Proto.Request_sendmsg)
  private:
   class HasBitSetters;
 
@@ -1153,7 +1175,7 @@ class Request_sendmsg :
 // -------------------------------------------------------------------
 
 class Response_sendmsg :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Response_sendmsg) */ {
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Response_sendmsg) */ {
  public:
   Response_sendmsg();
   virtual ~Response_sendmsg();
@@ -1237,7 +1259,7 @@ class Response_sendmsg :
   void InternalSwap(Response_sendmsg* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "Response_sendmsg";
+    return "Proto.Response_sendmsg";
   }
   private:
   inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
@@ -1273,13 +1295,152 @@ class Response_sendmsg :
   bool stat() const;
   void set_stat(bool value);
 
-  // @@protoc_insertion_point(class_scope:Response_sendmsg)
+  // @@protoc_insertion_point(class_scope:Proto.Response_sendmsg)
  private:
   class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
   ::PROTOBUF_NAMESPACE_ID::uint32 msgid_;
   bool stat_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_IMProtocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Message :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Proto.Message) */ {
+ public:
+  Message();
+  virtual ~Message();
+
+  Message(const Message& from);
+  Message(Message&& from) noexcept
+    : Message() {
+    *this = ::std::move(from);
+  }
+
+  inline Message& operator=(const Message& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Message& operator=(Message&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const Message& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Message* internal_default_instance() {
+    return reinterpret_cast<const Message*>(
+               &_Message_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(Message* other);
+  friend void swap(Message& a, Message& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Message* New() const final {
+    return CreateMaybeMessage<Message>(nullptr);
+  }
+
+  Message* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<Message>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const Message& from);
+  void MergeFrom(const Message& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  #else
+  bool MergePartialFromCodedStream(
+      ::PROTOBUF_NAMESPACE_ID::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::PROTOBUF_NAMESPACE_ID::io::CodedOutputStream* output) const final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* InternalSerializeWithCachedSizesToArray(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Message* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Proto.Message";
+  }
+  private:
+  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_IMProtocol_2eproto);
+    return ::descriptor_table_IMProtocol_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string msg = 3;
+  void clear_msg();
+  static const int kMsgFieldNumber = 3;
+  const std::string& msg() const;
+  void set_msg(const std::string& value);
+  void set_msg(std::string&& value);
+  void set_msg(const char* value);
+  void set_msg(const char* value, size_t size);
+  std::string* mutable_msg();
+  std::string* release_msg();
+  void set_allocated_msg(std::string* msg);
+
+  // uint64 fromID = 2;
+  void clear_fromid();
+  static const int kFromIDFieldNumber = 2;
+  ::PROTOBUF_NAMESPACE_ID::uint64 fromid() const;
+  void set_fromid(::PROTOBUF_NAMESPACE_ID::uint64 value);
+
+  // @@protoc_insertion_point(class_scope:Proto.Message)
+ private:
+  class HasBitSetters;
+
+  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr msg_;
+  ::PROTOBUF_NAMESPACE_ID::uint64 fromid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_IMProtocol_2eproto;
 };
@@ -1294,21 +1455,21 @@ class Response_sendmsg :
 #endif  // __GNUC__
 // Request
 
-// .Request.Type type = 1;
+// .Proto.Request.Type type = 1;
 inline void Request::clear_type() {
   type_ = 0;
 }
-inline ::Request_Type Request::type() const {
-  // @@protoc_insertion_point(field_get:Request.type)
-  return static_cast< ::Request_Type >(type_);
+inline ::Proto::Request_Type Request::type() const {
+  // @@protoc_insertion_point(field_get:Proto.Request.type)
+  return static_cast< ::Proto::Request_Type >(type_);
 }
-inline void Request::set_type(::Request_Type value) {
+inline void Request::set_type(::Proto::Request_Type value) {
   
   type_ = value;
-  // @@protoc_insertion_point(field_set:Request.type)
+  // @@protoc_insertion_point(field_set:Proto.Request.type)
 }
 
-// .Request_login request_login = 11;
+// .Proto.Request_login request_login = 11;
 inline bool Request::has_request_login() const {
   return pdu_case() == kRequestLogin;
 }
@@ -1321,35 +1482,35 @@ inline void Request::clear_request_login() {
     clear_has_pdu();
   }
 }
-inline ::Request_login* Request::release_request_login() {
-  // @@protoc_insertion_point(field_release:Request.request_login)
+inline ::Proto::Request_login* Request::release_request_login() {
+  // @@protoc_insertion_point(field_release:Proto.Request.request_login)
   if (has_request_login()) {
     clear_has_pdu();
-      ::Request_login* temp = pdu_.request_login_;
+      ::Proto::Request_login* temp = pdu_.request_login_;
     pdu_.request_login_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::Request_login& Request::request_login() const {
-  // @@protoc_insertion_point(field_get:Request.request_login)
+inline const ::Proto::Request_login& Request::request_login() const {
+  // @@protoc_insertion_point(field_get:Proto.Request.request_login)
   return has_request_login()
       ? *pdu_.request_login_
-      : *reinterpret_cast< ::Request_login*>(&::_Request_login_default_instance_);
+      : *reinterpret_cast< ::Proto::Request_login*>(&::Proto::_Request_login_default_instance_);
 }
-inline ::Request_login* Request::mutable_request_login() {
+inline ::Proto::Request_login* Request::mutable_request_login() {
   if (!has_request_login()) {
     clear_pdu();
     set_has_request_login();
-    pdu_.request_login_ = CreateMaybeMessage< ::Request_login >(
+    pdu_.request_login_ = CreateMaybeMessage< ::Proto::Request_login >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:Request.request_login)
+  // @@protoc_insertion_point(field_mutable:Proto.Request.request_login)
   return pdu_.request_login_;
 }
 
-// .Request_logout request_logout = 12;
+// .Proto.Request_logout request_logout = 12;
 inline bool Request::has_request_logout() const {
   return pdu_case() == kRequestLogout;
 }
@@ -1362,35 +1523,35 @@ inline void Request::clear_request_logout() {
     clear_has_pdu();
   }
 }
-inline ::Request_logout* Request::release_request_logout() {
-  // @@protoc_insertion_point(field_release:Request.request_logout)
+inline ::Proto::Request_logout* Request::release_request_logout() {
+  // @@protoc_insertion_point(field_release:Proto.Request.request_logout)
   if (has_request_logout()) {
     clear_has_pdu();
-      ::Request_logout* temp = pdu_.request_logout_;
+      ::Proto::Request_logout* temp = pdu_.request_logout_;
     pdu_.request_logout_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::Request_logout& Request::request_logout() const {
-  // @@protoc_insertion_point(field_get:Request.request_logout)
+inline const ::Proto::Request_logout& Request::request_logout() const {
+  // @@protoc_insertion_point(field_get:Proto.Request.request_logout)
   return has_request_logout()
       ? *pdu_.request_logout_
-      : *reinterpret_cast< ::Request_logout*>(&::_Request_logout_default_instance_);
+      : *reinterpret_cast< ::Proto::Request_logout*>(&::Proto::_Request_logout_default_instance_);
 }
-inline ::Request_logout* Request::mutable_request_logout() {
+inline ::Proto::Request_logout* Request::mutable_request_logout() {
   if (!has_request_logout()) {
     clear_pdu();
     set_has_request_logout();
-    pdu_.request_logout_ = CreateMaybeMessage< ::Request_logout >(
+    pdu_.request_logout_ = CreateMaybeMessage< ::Proto::Request_logout >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:Request.request_logout)
+  // @@protoc_insertion_point(field_mutable:Proto.Request.request_logout)
   return pdu_.request_logout_;
 }
 
-// .Request_sendmsg request_sendmsg = 13;
+// .Proto.Request_sendmsg request_sendmsg = 13;
 inline bool Request::has_request_sendmsg() const {
   return pdu_case() == kRequestSendmsg;
 }
@@ -1403,31 +1564,31 @@ inline void Request::clear_request_sendmsg() {
     clear_has_pdu();
   }
 }
-inline ::Request_sendmsg* Request::release_request_sendmsg() {
-  // @@protoc_insertion_point(field_release:Request.request_sendmsg)
+inline ::Proto::Request_sendmsg* Request::release_request_sendmsg() {
+  // @@protoc_insertion_point(field_release:Proto.Request.request_sendmsg)
   if (has_request_sendmsg()) {
     clear_has_pdu();
-      ::Request_sendmsg* temp = pdu_.request_sendmsg_;
+      ::Proto::Request_sendmsg* temp = pdu_.request_sendmsg_;
     pdu_.request_sendmsg_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::Request_sendmsg& Request::request_sendmsg() const {
-  // @@protoc_insertion_point(field_get:Request.request_sendmsg)
+inline const ::Proto::Request_sendmsg& Request::request_sendmsg() const {
+  // @@protoc_insertion_point(field_get:Proto.Request.request_sendmsg)
   return has_request_sendmsg()
       ? *pdu_.request_sendmsg_
-      : *reinterpret_cast< ::Request_sendmsg*>(&::_Request_sendmsg_default_instance_);
+      : *reinterpret_cast< ::Proto::Request_sendmsg*>(&::Proto::_Request_sendmsg_default_instance_);
 }
-inline ::Request_sendmsg* Request::mutable_request_sendmsg() {
+inline ::Proto::Request_sendmsg* Request::mutable_request_sendmsg() {
   if (!has_request_sendmsg()) {
     clear_pdu();
     set_has_request_sendmsg();
-    pdu_.request_sendmsg_ = CreateMaybeMessage< ::Request_sendmsg >(
+    pdu_.request_sendmsg_ = CreateMaybeMessage< ::Proto::Request_sendmsg >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:Request.request_sendmsg)
+  // @@protoc_insertion_point(field_mutable:Proto.Request.request_sendmsg)
   return pdu_.request_sendmsg_;
 }
 
@@ -1444,21 +1605,21 @@ inline Request::PduCase Request::pdu_case() const {
 
 // Response
 
-// .Response.Type type = 1;
+// .Proto.Response.Type type = 1;
 inline void Response::clear_type() {
   type_ = 0;
 }
-inline ::Response_Type Response::type() const {
-  // @@protoc_insertion_point(field_get:Response.type)
-  return static_cast< ::Response_Type >(type_);
+inline ::Proto::Response_Type Response::type() const {
+  // @@protoc_insertion_point(field_get:Proto.Response.type)
+  return static_cast< ::Proto::Response_Type >(type_);
 }
-inline void Response::set_type(::Response_Type value) {
+inline void Response::set_type(::Proto::Response_Type value) {
   
   type_ = value;
-  // @@protoc_insertion_point(field_set:Response.type)
+  // @@protoc_insertion_point(field_set:Proto.Response.type)
 }
 
-// .Response_login response_login = 11;
+// .Proto.Response_login response_login = 11;
 inline bool Response::has_response_login() const {
   return pdu_case() == kResponseLogin;
 }
@@ -1471,35 +1632,35 @@ inline void Response::clear_response_login() {
     clear_has_pdu();
   }
 }
-inline ::Response_login* Response::release_response_login() {
-  // @@protoc_insertion_point(field_release:Response.response_login)
+inline ::Proto::Response_login* Response::release_response_login() {
+  // @@protoc_insertion_point(field_release:Proto.Response.response_login)
   if (has_response_login()) {
     clear_has_pdu();
-      ::Response_login* temp = pdu_.response_login_;
+      ::Proto::Response_login* temp = pdu_.response_login_;
     pdu_.response_login_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::Response_login& Response::response_login() const {
-  // @@protoc_insertion_point(field_get:Response.response_login)
+inline const ::Proto::Response_login& Response::response_login() const {
+  // @@protoc_insertion_point(field_get:Proto.Response.response_login)
   return has_response_login()
       ? *pdu_.response_login_
-      : *reinterpret_cast< ::Response_login*>(&::_Response_login_default_instance_);
+      : *reinterpret_cast< ::Proto::Response_login*>(&::Proto::_Response_login_default_instance_);
 }
-inline ::Response_login* Response::mutable_response_login() {
+inline ::Proto::Response_login* Response::mutable_response_login() {
   if (!has_response_login()) {
     clear_pdu();
     set_has_response_login();
-    pdu_.response_login_ = CreateMaybeMessage< ::Response_login >(
+    pdu_.response_login_ = CreateMaybeMessage< ::Proto::Response_login >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:Response.response_login)
+  // @@protoc_insertion_point(field_mutable:Proto.Response.response_login)
   return pdu_.response_login_;
 }
 
-// .Response_sendmsg response_sendmsg = 13;
+// .Proto.Response_sendmsg response_sendmsg = 13;
 inline bool Response::has_response_sendmsg() const {
   return pdu_case() == kResponseSendmsg;
 }
@@ -1512,32 +1673,73 @@ inline void Response::clear_response_sendmsg() {
     clear_has_pdu();
   }
 }
-inline ::Response_sendmsg* Response::release_response_sendmsg() {
-  // @@protoc_insertion_point(field_release:Response.response_sendmsg)
+inline ::Proto::Response_sendmsg* Response::release_response_sendmsg() {
+  // @@protoc_insertion_point(field_release:Proto.Response.response_sendmsg)
   if (has_response_sendmsg()) {
     clear_has_pdu();
-      ::Response_sendmsg* temp = pdu_.response_sendmsg_;
+      ::Proto::Response_sendmsg* temp = pdu_.response_sendmsg_;
     pdu_.response_sendmsg_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::Response_sendmsg& Response::response_sendmsg() const {
-  // @@protoc_insertion_point(field_get:Response.response_sendmsg)
+inline const ::Proto::Response_sendmsg& Response::response_sendmsg() const {
+  // @@protoc_insertion_point(field_get:Proto.Response.response_sendmsg)
   return has_response_sendmsg()
       ? *pdu_.response_sendmsg_
-      : *reinterpret_cast< ::Response_sendmsg*>(&::_Response_sendmsg_default_instance_);
+      : *reinterpret_cast< ::Proto::Response_sendmsg*>(&::Proto::_Response_sendmsg_default_instance_);
 }
-inline ::Response_sendmsg* Response::mutable_response_sendmsg() {
+inline ::Proto::Response_sendmsg* Response::mutable_response_sendmsg() {
   if (!has_response_sendmsg()) {
     clear_pdu();
     set_has_response_sendmsg();
-    pdu_.response_sendmsg_ = CreateMaybeMessage< ::Response_sendmsg >(
+    pdu_.response_sendmsg_ = CreateMaybeMessage< ::Proto::Response_sendmsg >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:Response.response_sendmsg)
+  // @@protoc_insertion_point(field_mutable:Proto.Response.response_sendmsg)
   return pdu_.response_sendmsg_;
+}
+
+// .Proto.Message msg = 14;
+inline bool Response::has_msg() const {
+  return pdu_case() == kMsg;
+}
+inline void Response::set_has_msg() {
+  _oneof_case_[0] = kMsg;
+}
+inline void Response::clear_msg() {
+  if (has_msg()) {
+    delete pdu_.msg_;
+    clear_has_pdu();
+  }
+}
+inline ::Proto::Message* Response::release_msg() {
+  // @@protoc_insertion_point(field_release:Proto.Response.msg)
+  if (has_msg()) {
+    clear_has_pdu();
+      ::Proto::Message* temp = pdu_.msg_;
+    pdu_.msg_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::Proto::Message& Response::msg() const {
+  // @@protoc_insertion_point(field_get:Proto.Response.msg)
+  return has_msg()
+      ? *pdu_.msg_
+      : *reinterpret_cast< ::Proto::Message*>(&::Proto::_Message_default_instance_);
+}
+inline ::Proto::Message* Response::mutable_msg() {
+  if (!has_msg()) {
+    clear_pdu();
+    set_has_msg();
+    pdu_.msg_ = CreateMaybeMessage< ::Proto::Message >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:Proto.Response.msg)
+  return pdu_.msg_;
 }
 
 inline bool Response::has_pdu() const {
@@ -1558,13 +1760,13 @@ inline void Request_login::clear_id() {
   id_ = PROTOBUF_ULONGLONG(0);
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 Request_login::id() const {
-  // @@protoc_insertion_point(field_get:Request_login.ID)
+  // @@protoc_insertion_point(field_get:Proto.Request_login.ID)
   return id_;
 }
 inline void Request_login::set_id(::PROTOBUF_NAMESPACE_ID::uint64 value) {
   
   id_ = value;
-  // @@protoc_insertion_point(field_set:Request_login.ID)
+  // @@protoc_insertion_point(field_set:Proto.Request_login.ID)
 }
 
 // string password = 2;
@@ -1572,39 +1774,39 @@ inline void Request_login::clear_password() {
   password_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& Request_login::password() const {
-  // @@protoc_insertion_point(field_get:Request_login.password)
+  // @@protoc_insertion_point(field_get:Proto.Request_login.password)
   return password_.GetNoArena();
 }
 inline void Request_login::set_password(const std::string& value) {
   
   password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:Request_login.password)
+  // @@protoc_insertion_point(field_set:Proto.Request_login.password)
 }
 inline void Request_login::set_password(std::string&& value) {
   
   password_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:Request_login.password)
+  // @@protoc_insertion_point(field_set_rvalue:Proto.Request_login.password)
 }
 inline void Request_login::set_password(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:Request_login.password)
+  // @@protoc_insertion_point(field_set_char:Proto.Request_login.password)
 }
 inline void Request_login::set_password(const char* value, size_t size) {
   
   password_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:Request_login.password)
+  // @@protoc_insertion_point(field_set_pointer:Proto.Request_login.password)
 }
 inline std::string* Request_login::mutable_password() {
   
-  // @@protoc_insertion_point(field_mutable:Request_login.password)
+  // @@protoc_insertion_point(field_mutable:Proto.Request_login.password)
   return password_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* Request_login::release_password() {
-  // @@protoc_insertion_point(field_release:Request_login.password)
+  // @@protoc_insertion_point(field_release:Proto.Request_login.password)
   
   return password_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -1615,25 +1817,25 @@ inline void Request_login::set_allocated_password(std::string* password) {
     
   }
   password_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), password);
-  // @@protoc_insertion_point(field_set_allocated:Request_login.password)
+  // @@protoc_insertion_point(field_set_allocated:Proto.Request_login.password)
 }
 
 // -------------------------------------------------------------------
 
 // Response_login
 
-// .Response_login.STAT stat = 1;
+// .Proto.Response_login.STAT stat = 1;
 inline void Response_login::clear_stat() {
   stat_ = 0;
 }
-inline ::Response_login_STAT Response_login::stat() const {
-  // @@protoc_insertion_point(field_get:Response_login.stat)
-  return static_cast< ::Response_login_STAT >(stat_);
+inline ::Proto::Response_login_STAT Response_login::stat() const {
+  // @@protoc_insertion_point(field_get:Proto.Response_login.stat)
+  return static_cast< ::Proto::Response_login_STAT >(stat_);
 }
-inline void Response_login::set_stat(::Response_login_STAT value) {
+inline void Response_login::set_stat(::Proto::Response_login_STAT value) {
   
   stat_ = value;
-  // @@protoc_insertion_point(field_set:Response_login.stat)
+  // @@protoc_insertion_point(field_set:Proto.Response_login.stat)
 }
 
 // -------------------------------------------------------------------
@@ -1645,13 +1847,13 @@ inline void Request_logout::clear_id() {
   id_ = PROTOBUF_ULONGLONG(0);
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 Request_logout::id() const {
-  // @@protoc_insertion_point(field_get:Request_logout.ID)
+  // @@protoc_insertion_point(field_get:Proto.Request_logout.ID)
   return id_;
 }
 inline void Request_logout::set_id(::PROTOBUF_NAMESPACE_ID::uint64 value) {
   
   id_ = value;
-  // @@protoc_insertion_point(field_set:Request_logout.ID)
+  // @@protoc_insertion_point(field_set:Proto.Request_logout.ID)
 }
 
 // -------------------------------------------------------------------
@@ -1663,13 +1865,13 @@ inline void Request_sendmsg::clear_msgid() {
   msgid_ = 0u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 Request_sendmsg::msgid() const {
-  // @@protoc_insertion_point(field_get:Request_sendmsg.msgID)
+  // @@protoc_insertion_point(field_get:Proto.Request_sendmsg.msgID)
   return msgid_;
 }
 inline void Request_sendmsg::set_msgid(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   
   msgid_ = value;
-  // @@protoc_insertion_point(field_set:Request_sendmsg.msgID)
+  // @@protoc_insertion_point(field_set:Proto.Request_sendmsg.msgID)
 }
 
 // uint64 ID = 2;
@@ -1677,13 +1879,13 @@ inline void Request_sendmsg::clear_id() {
   id_ = PROTOBUF_ULONGLONG(0);
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 Request_sendmsg::id() const {
-  // @@protoc_insertion_point(field_get:Request_sendmsg.ID)
+  // @@protoc_insertion_point(field_get:Proto.Request_sendmsg.ID)
   return id_;
 }
 inline void Request_sendmsg::set_id(::PROTOBUF_NAMESPACE_ID::uint64 value) {
   
   id_ = value;
-  // @@protoc_insertion_point(field_set:Request_sendmsg.ID)
+  // @@protoc_insertion_point(field_set:Proto.Request_sendmsg.ID)
 }
 
 // uint64 objID = 3;
@@ -1691,13 +1893,13 @@ inline void Request_sendmsg::clear_objid() {
   objid_ = PROTOBUF_ULONGLONG(0);
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint64 Request_sendmsg::objid() const {
-  // @@protoc_insertion_point(field_get:Request_sendmsg.objID)
+  // @@protoc_insertion_point(field_get:Proto.Request_sendmsg.objID)
   return objid_;
 }
 inline void Request_sendmsg::set_objid(::PROTOBUF_NAMESPACE_ID::uint64 value) {
   
   objid_ = value;
-  // @@protoc_insertion_point(field_set:Request_sendmsg.objID)
+  // @@protoc_insertion_point(field_set:Proto.Request_sendmsg.objID)
 }
 
 // string msg = 4;
@@ -1705,39 +1907,39 @@ inline void Request_sendmsg::clear_msg() {
   msg_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline const std::string& Request_sendmsg::msg() const {
-  // @@protoc_insertion_point(field_get:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_get:Proto.Request_sendmsg.msg)
   return msg_.GetNoArena();
 }
 inline void Request_sendmsg::set_msg(const std::string& value) {
   
   msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_set:Proto.Request_sendmsg.msg)
 }
 inline void Request_sendmsg::set_msg(std::string&& value) {
   
   msg_.SetNoArena(
     &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_set_rvalue:Proto.Request_sendmsg.msg)
 }
 inline void Request_sendmsg::set_msg(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_set_char:Proto.Request_sendmsg.msg)
 }
 inline void Request_sendmsg::set_msg(const char* value, size_t size) {
   
   msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_set_pointer:Proto.Request_sendmsg.msg)
 }
 inline std::string* Request_sendmsg::mutable_msg() {
   
-  // @@protoc_insertion_point(field_mutable:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_mutable:Proto.Request_sendmsg.msg)
   return msg_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 inline std::string* Request_sendmsg::release_msg() {
-  // @@protoc_insertion_point(field_release:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_release:Proto.Request_sendmsg.msg)
   
   return msg_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -1748,7 +1950,7 @@ inline void Request_sendmsg::set_allocated_msg(std::string* msg) {
     
   }
   msg_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), msg);
-  // @@protoc_insertion_point(field_set_allocated:Request_sendmsg.msg)
+  // @@protoc_insertion_point(field_set_allocated:Proto.Request_sendmsg.msg)
 }
 
 // -------------------------------------------------------------------
@@ -1760,13 +1962,13 @@ inline void Response_sendmsg::clear_msgid() {
   msgid_ = 0u;
 }
 inline ::PROTOBUF_NAMESPACE_ID::uint32 Response_sendmsg::msgid() const {
-  // @@protoc_insertion_point(field_get:Response_sendmsg.msgID)
+  // @@protoc_insertion_point(field_get:Proto.Response_sendmsg.msgID)
   return msgid_;
 }
 inline void Response_sendmsg::set_msgid(::PROTOBUF_NAMESPACE_ID::uint32 value) {
   
   msgid_ = value;
-  // @@protoc_insertion_point(field_set:Response_sendmsg.msgID)
+  // @@protoc_insertion_point(field_set:Proto.Response_sendmsg.msgID)
 }
 
 // bool stat = 2;
@@ -1774,13 +1976,82 @@ inline void Response_sendmsg::clear_stat() {
   stat_ = false;
 }
 inline bool Response_sendmsg::stat() const {
-  // @@protoc_insertion_point(field_get:Response_sendmsg.stat)
+  // @@protoc_insertion_point(field_get:Proto.Response_sendmsg.stat)
   return stat_;
 }
 inline void Response_sendmsg::set_stat(bool value) {
   
   stat_ = value;
-  // @@protoc_insertion_point(field_set:Response_sendmsg.stat)
+  // @@protoc_insertion_point(field_set:Proto.Response_sendmsg.stat)
+}
+
+// -------------------------------------------------------------------
+
+// Message
+
+// uint64 fromID = 2;
+inline void Message::clear_fromid() {
+  fromid_ = PROTOBUF_ULONGLONG(0);
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint64 Message::fromid() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.fromID)
+  return fromid_;
+}
+inline void Message::set_fromid(::PROTOBUF_NAMESPACE_ID::uint64 value) {
+  
+  fromid_ = value;
+  // @@protoc_insertion_point(field_set:Proto.Message.fromID)
+}
+
+// string msg = 3;
+inline void Message::clear_msg() {
+  msg_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline const std::string& Message::msg() const {
+  // @@protoc_insertion_point(field_get:Proto.Message.msg)
+  return msg_.GetNoArena();
+}
+inline void Message::set_msg(const std::string& value) {
+  
+  msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Message.msg)
+}
+inline void Message::set_msg(std::string&& value) {
+  
+  msg_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Proto.Message.msg)
+}
+inline void Message::set_msg(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Message.msg)
+}
+inline void Message::set_msg(const char* value, size_t size) {
+  
+  msg_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Message.msg)
+}
+inline std::string* Message::mutable_msg() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Message.msg)
+  return msg_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Message::release_msg() {
+  // @@protoc_insertion_point(field_release:Proto.Message.msg)
+  
+  return msg_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Message::set_allocated_msg(std::string* msg) {
+  if (msg != nullptr) {
+    
+  } else {
+    
+  }
+  msg_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), msg);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Message.msg)
 }
 
 #ifdef __GNUC__
@@ -1798,26 +2069,29 @@ inline void Response_sendmsg::set_stat(bool value) {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
+}  // namespace Proto
 
 PROTOBUF_NAMESPACE_OPEN
 
-template <> struct is_proto_enum< ::Request_Type> : ::std::true_type {};
+template <> struct is_proto_enum< ::Proto::Request_Type> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Request_Type>() {
-  return ::Request_Type_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::Proto::Request_Type>() {
+  return ::Proto::Request_Type_descriptor();
 }
-template <> struct is_proto_enum< ::Response_Type> : ::std::true_type {};
+template <> struct is_proto_enum< ::Proto::Response_Type> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Response_Type>() {
-  return ::Response_Type_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::Proto::Response_Type>() {
+  return ::Proto::Response_Type_descriptor();
 }
-template <> struct is_proto_enum< ::Response_login_STAT> : ::std::true_type {};
+template <> struct is_proto_enum< ::Proto::Response_login_STAT> : ::std::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Response_login_STAT>() {
-  return ::Response_login_STAT_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::Proto::Response_login_STAT>() {
+  return ::Proto::Response_login_STAT_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

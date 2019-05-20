@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package Proto;
+
 // 
 message Request {
 
@@ -25,6 +27,7 @@ message Response {
 		LOGIN	= 0;
 		LOGOUT	= 1;
 		SENDMSG = 2;
+		MESSAGE = 3;
 	}
 
 	Type type = 1;
@@ -32,6 +35,8 @@ message Response {
 		Response_login	response_login		= 11;
 		//Response_logout	response_logout	= 12;
 		Response_sendmsg response_sendmsg	= 13;
+		//其他账号发送的消息
+		Message msg							= 14;
 	}
 }
 
@@ -90,3 +95,14 @@ message Response_sendmsg {
 	// Next available id: 1
 }
 
+// 消息推送
+message Message {
+	// 消息类型
+	//enum MsgType {
+
+	//}
+
+	//MsgType type	=1;
+	uint64 fromID	=2;
+	string msg		=3;
+}

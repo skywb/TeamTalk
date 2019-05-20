@@ -2,9 +2,9 @@
 
 #include "reactor/IMReactor.h"
 #include "reactor/task.h"
-#include "IM/IMProtocol.h"
-#include "IM/login_server.h"
+#include "server/loginTask.h"
 #include "dao/UserDao.h"
+#include "util/Log.h"
 
 using namespace	IM;
 
@@ -12,29 +12,59 @@ using namespace	IM;
 
 void ReadableTask::doit() {
 
+	std::cout << "ReadableTask" << std::endl;		
 	while(true) {
-		auto pdu = IM::makeIMPdu(p_con);
-		if(!pdu) {
+		auto request = p_con->recive();
+		if(!request) {
 			break;
 		}
-		//std::cout << "new Pdu" << std::endl;
+		switch (request->type()) {
+			case Proto::Request_Type_LOGIN:
+				if(!request->has_request_login()) {
+					Log::log(Log::ERROR, "协议格式错误");
+				}
 
-		switch (pdu->getCommand()) {
-			case IM::LOGIN:
-				::IMReactor::getInstances()->addTask(
-						std::make_shared<LoginTask>(std::dynamic_pointer_cast<IM::LoginPdu> (pdu), p_con));
+				{
+					const Proto::Request_login& request_login = request->request_login();
+					std::cout << "login id: " << request_login.id() << std::endl;
+					std::cout << "login password: " << request_login.password() << std::endl;
+					Proto::Response *response = new Proto::Response();
+					Proto::Response_login* response_login = new Proto::Response_login();
+					LoginTask task(request_login, *response_login);
+					task.doit();
+					response->set_allocated_response_login(response_login);
+					p_con->send(response);
+					delete request;
+					delete response;
+				}
 				break;
-			case IM::LOGOUT:
-				std::cout << "logout" << std::endl;
+			case Proto::Request_Type_LOGOUT:
 				break;
-			case IM::SENDMSG:
-				std::cout << "send message" << std::endl;
+			case Proto::Request_Type_SENDMSG:
 				break;
 			default:
-				std::cout << "what are you doing" << std::endl;
 				break;
-
+				
 		}
+
+
+
+		//switch (pdu->getCommand()) {
+		//	case IM::LOGIN:
+		//		::IMReactor::getInstances()->addTask(
+		//				std::make_shared<LoginTask>(std::dynamic_pointer_cast<IM::LoginPdu> (pdu), p_con));
+		//		break;
+		//	case IM::LOGOUT:
+		//		std::cout << "logout" << std::endl;
+		//		break;
+		//	case IM::SENDMSG:
+		//		std::cout << "send message" << std::endl;
+		//		break;
+		//	default:
+		//		std::cout << "what are you doing" << std::endl;
+		//		break;
+
+		//}
 
 	}
 
@@ -59,50 +89,4 @@ void NewConnectTask::doit() {
 	std::cout << "newConnect task doing..." << std::endl;
 
 }
-
-
-void LoginTask::doit() {
-	User user;
-	user.setId(userPdu->getUserId());
-	user.setPassword(userPdu->getPassword());
-
-
-	auto userConn = ConnMap::findConnecterById(user.getId());
-	if(userConn != nullptr) {
-		/* TODO: 
-		 * 顶掉线
-		 * <17-05-19, sky> */
-		std::cout << "用户已在线" << std::endl;
-		return ;
-	}
-
-	User* dbUser = UserDao::Obtain(user.getId());
-
-	//账号不存在
-	if(dbUser == nullptr) {
-		//std::cout << "账号不存在" << std::endl;
-		p_con->send("账号不存在");
-		return ;
-	}
-	//登录成功
-	if(user.getPassword() == dbUser->getPassword()) {
-
-		//std::cout << "登录成功" << std::endl;
-		p_con->send("登录成功");
-		ConnMap::addAccount(std::make_pair(user.getId(), p_con));
-
-	} else { //密码错误
-
-		//std::cout << "密码错误" << std::endl;
-		p_con->send("密码错误");
-   	}
-
-	/* TODO: 
-	 * 从数据库获取user信息
-	 * 对比密码
-	 * 登录成功则插入sockmap中
-	 * 否则返回错误信息
-	 * <08-05-19, sky> */
-}
-
 
