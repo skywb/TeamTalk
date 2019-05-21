@@ -62,6 +62,7 @@ message Response_login {
 	}
 
 	STAT stat = 1;
+	string friends = 2;
 	// Next available id: 1
 }
 

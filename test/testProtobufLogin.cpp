@@ -77,6 +77,7 @@ int main()
 				switch (stat.stat()) {
 					case Proto::Response_login_STAT_SUCCESS:
 						std::cout << "登录成功" << std::endl;
+						std::cout << stat.friends() << std::endl;
 						break;
 					case Proto::Response_login_STAT_PASSWORD_ERROR:
 						std::cout << "密码错误" << std::endl;	

@@ -13,7 +13,6 @@
 #define MYSQLACCOUNT "root"
 #define MYSQLPASSWORD "root"
 
-#include "IM/User.h"
 
 namespace DBUtil {
 

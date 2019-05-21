@@ -217,6 +217,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_IMProtocol_2eproto::offsets[] 
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::Proto::Response_login, stat_),
+  PROTOBUF_FIELD_OFFSET(::Proto::Response_login, friends_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Proto::Request_logout, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -252,10 +253,10 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 10, -1, sizeof(::Proto::Response)},
   { 20, -1, sizeof(::Proto::Request_login)},
   { 27, -1, sizeof(::Proto::Response_login)},
-  { 33, -1, sizeof(::Proto::Request_logout)},
-  { 39, -1, sizeof(::Proto::Request_sendmsg)},
-  { 48, -1, sizeof(::Proto::Response_sendmsg)},
-  { 55, -1, sizeof(::Proto::Message)},
+  { 34, -1, sizeof(::Proto::Request_logout)},
+  { 40, -1, sizeof(::Proto::Request_sendmsg)},
+  { 49, -1, sizeof(::Proto::Response_sendmsg)},
+  { 56, -1, sizeof(::Proto::Message)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -284,15 +285,16 @@ const char descriptor_table_protodef_IMProtocol_2eproto[] PROTOBUF_SECTION_VARIA
   "to.MessageH\000\"7\n\004Type\022\t\n\005LOGIN\020\000\022\n\n\006LOGOU"
   "T\020\001\022\013\n\007SENDMSG\020\002\022\013\n\007MESSAGE\020\003B\005\n\003pdu\"-\n\r"
   "Request_login\022\n\n\002ID\030\001 \001(\004\022\020\n\010password\030\002 "
-  "\001(\t\"\222\001\n\016Response_login\022(\n\004stat\030\001 \001(\0162\032.P"
-  "roto.Response_login.STAT\"V\n\004STAT\022\013\n\007SUCC"
-  "ESS\020\000\022\020\n\014ACCOUNT_NULL\020\001\022\020\n\014ACCOUNT_LOCK\020"
-  "\002\022\022\n\016PASSWORD_ERROR\020\003\022\t\n\005ERROR\020\n\"\034\n\016Requ"
-  "est_logout\022\n\n\002ID\030\001 \001(\004\"H\n\017Request_sendms"
-  "g\022\r\n\005msgID\030\001 \001(\r\022\n\n\002ID\030\002 \001(\004\022\r\n\005objID\030\003 "
-  "\001(\004\022\013\n\003msg\030\004 \001(\t\"/\n\020Response_sendmsg\022\r\n\005"
-  "msgID\030\001 \001(\r\022\014\n\004stat\030\002 \001(\010\"&\n\007Message\022\016\n\006"
-  "fromID\030\002 \001(\004\022\013\n\003msg\030\003 \001(\tb\006proto3"
+  "\001(\t\"\243\001\n\016Response_login\022(\n\004stat\030\001 \001(\0162\032.P"
+  "roto.Response_login.STAT\022\017\n\007friends\030\002 \001("
+  "\t\"V\n\004STAT\022\013\n\007SUCCESS\020\000\022\020\n\014ACCOUNT_NULL\020\001"
+  "\022\020\n\014ACCOUNT_LOCK\020\002\022\022\n\016PASSWORD_ERROR\020\003\022\t"
+  "\n\005ERROR\020\n\"\034\n\016Request_logout\022\n\n\002ID\030\001 \001(\004\""
+  "H\n\017Request_sendmsg\022\r\n\005msgID\030\001 \001(\r\022\n\n\002ID\030"
+  "\002 \001(\004\022\r\n\005objID\030\003 \001(\004\022\013\n\003msg\030\004 \001(\t\"/\n\020Res"
+  "ponse_sendmsg\022\r\n\005msgID\030\001 \001(\r\022\014\n\004stat\030\002 \001"
+  "(\010\"&\n\007Message\022\016\n\006fromID\030\002 \001(\004\022\013\n\003msg\030\003 \001"
+  "(\tb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_IMProtocol_2eproto_deps[1] = {
 };
@@ -309,7 +311,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_IMP
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_IMProtocol_2eproto_once;
 static bool descriptor_table_IMProtocol_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_IMProtocol_2eproto = {
-  &descriptor_table_IMProtocol_2eproto_initialized, descriptor_table_protodef_IMProtocol_2eproto, "IMProtocol.proto", 913,
+  &descriptor_table_IMProtocol_2eproto_initialized, descriptor_table_protodef_IMProtocol_2eproto, "IMProtocol.proto", 930,
   &descriptor_table_IMProtocol_2eproto_once, descriptor_table_IMProtocol_2eproto_sccs, descriptor_table_IMProtocol_2eproto_deps, 8, 0,
   schemas, file_default_instances, TableStruct_IMProtocol_2eproto::offsets,
   file_level_metadata_IMProtocol_2eproto, 8, file_level_enum_descriptors_IMProtocol_2eproto, file_level_service_descriptors_IMProtocol_2eproto,
@@ -1748,6 +1750,7 @@ class Response_login::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Response_login::kStatFieldNumber;
+const int Response_login::kFriendsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Response_login::Response_login()
@@ -1759,11 +1762,17 @@ Response_login::Response_login(const Response_login& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  friends_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (from.friends().size() > 0) {
+    friends_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.friends_);
+  }
   stat_ = from.stat_;
   // @@protoc_insertion_point(copy_constructor:Proto.Response_login)
 }
 
 void Response_login::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_Response_login_IMProtocol_2eproto.base);
+  friends_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   stat_ = 0;
 }
 
@@ -1773,6 +1782,7 @@ Response_login::~Response_login() {
 }
 
 void Response_login::SharedDtor() {
+  friends_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void Response_login::SetCachedSize(int size) const {
@@ -1790,6 +1800,7 @@ void Response_login::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  friends_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   stat_ = 0;
   _internal_metadata_.Clear();
 }
@@ -1808,6 +1819,13 @@ const char* Response_login::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint(&ptr);
           CHK_(ptr);
           set_stat(static_cast<::Proto::Response_login_STAT>(val));
+        } else goto handle_unusual;
+        continue;
+      // string friends = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParserUTF8(mutable_friends(), ptr, ctx, "Proto.Response_login.friends");
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -1854,6 +1872,21 @@ bool Response_login::MergePartialFromCodedStream(
         break;
       }
 
+      // string friends = 2;
+      case 2: {
+        if (static_cast< ::PROTOBUF_NAMESPACE_ID::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::ReadString(
+                input, this->mutable_friends()));
+          DO_(::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+            this->friends().data(), static_cast<int>(this->friends().length()),
+            ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::PARSE,
+            "Proto.Response_login.friends"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1887,6 +1920,16 @@ void Response_login::SerializeWithCachedSizes(
       1, this->stat(), output);
   }
 
+  // string friends = 2;
+  if (this->friends().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->friends().data(), static_cast<int>(this->friends().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Proto.Response_login.friends");
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->friends(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1904,6 +1947,17 @@ void Response_login::SerializeWithCachedSizes(
   if (this->stat() != 0) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
       1, this->stat(), target);
+  }
+
+  // string friends = 2;
+  if (this->friends().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->friends().data(), static_cast<int>(this->friends().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Proto.Response_login.friends");
+    target =
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteStringToArray(
+        2, this->friends(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1926,6 +1980,13 @@ size_t Response_login::ByteSizeLong() const {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string friends = 2;
+  if (this->friends().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->friends());
+  }
 
   // .Proto.Response_login.STAT stat = 1;
   if (this->stat() != 0) {
@@ -1960,6 +2021,10 @@ void Response_login::MergeFrom(const Response_login& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.friends().size() > 0) {
+
+    friends_.AssignWithDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from.friends_);
+  }
   if (from.stat() != 0) {
     set_stat(from.stat());
   }
@@ -1990,6 +2055,8 @@ void Response_login::Swap(Response_login* other) {
 void Response_login::InternalSwap(Response_login* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  friends_.Swap(&other->friends_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(stat_, other->stat_);
 }
 

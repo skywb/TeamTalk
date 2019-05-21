@@ -878,6 +878,18 @@ class Response_login :
 
   // accessors -------------------------------------------------------
 
+  // string friends = 2;
+  void clear_friends();
+  static const int kFriendsFieldNumber = 2;
+  const std::string& friends() const;
+  void set_friends(const std::string& value);
+  void set_friends(std::string&& value);
+  void set_friends(const char* value);
+  void set_friends(const char* value, size_t size);
+  std::string* mutable_friends();
+  std::string* release_friends();
+  void set_allocated_friends(std::string* friends);
+
   // .Proto.Response_login.STAT stat = 1;
   void clear_stat();
   static const int kStatFieldNumber = 1;
@@ -889,6 +901,7 @@ class Response_login :
   class HasBitSetters;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr friends_;
   int stat_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_IMProtocol_2eproto;
@@ -1836,6 +1849,57 @@ inline void Response_login::set_stat(::Proto::Response_login_STAT value) {
   
   stat_ = value;
   // @@protoc_insertion_point(field_set:Proto.Response_login.stat)
+}
+
+// string friends = 2;
+inline void Response_login::clear_friends() {
+  friends_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline const std::string& Response_login::friends() const {
+  // @@protoc_insertion_point(field_get:Proto.Response_login.friends)
+  return friends_.GetNoArena();
+}
+inline void Response_login::set_friends(const std::string& value) {
+  
+  friends_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:Proto.Response_login.friends)
+}
+inline void Response_login::set_friends(std::string&& value) {
+  
+  friends_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:Proto.Response_login.friends)
+}
+inline void Response_login::set_friends(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  friends_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:Proto.Response_login.friends)
+}
+inline void Response_login::set_friends(const char* value, size_t size) {
+  
+  friends_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:Proto.Response_login.friends)
+}
+inline std::string* Response_login::mutable_friends() {
+  
+  // @@protoc_insertion_point(field_mutable:Proto.Response_login.friends)
+  return friends_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* Response_login::release_friends() {
+  // @@protoc_insertion_point(field_release:Proto.Response_login.friends)
+  
+  return friends_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void Response_login::set_allocated_friends(std::string* friends) {
+  if (friends != nullptr) {
+    
+  } else {
+    
+  }
+  friends_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), friends);
+  // @@protoc_insertion_point(field_set_allocated:Proto.Response_login.friends)
 }
 
 // -------------------------------------------------------------------

@@ -60,6 +60,7 @@ void LoginTask::doit() {
 	if(user.getPassword() == dbUser->getPassword()) {
 
 		response.set_stat(Proto::Response_login_STAT_SUCCESS);
+		response.set_friends(dbUser->getFriends());
 		//ConnMap::addAccount(std::make_pair(user.getId(), p_con));
 
 	} else { //密码错误
