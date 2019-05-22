@@ -8,15 +8,19 @@ class FriendDao : public DBUtil::Dao
 public:
 	virtual ~FriendDao () { }
 
-	/* TODO:  <21-05-19, yourname> */
 	std::vector<std::pair<User::Account, int>> getAllFriendsByID(User::Account id);
-	bool addFriend(User::Account id, User::Account friendID);
+	bool addFriend(User::Account id, User::Account friendID, int groupIDInThisAccount = 1);
 	bool delFriend(User::Account id, User::Account friendID);
 
+	std::string getGroupNameByID(int ID);
+	std::string getGroupNameByID(User::Account UserID, int groupIDInUser);
+	bool updateGroupName(User::Account userID, int groupIdInThisUser, const std::string name);
+	bool delGroup(User::Account userID, int groupIdInThisUser);
+	int addGroup(User::Account userID, const std::string groupName);
 	
+	static FriendDao* getInstance() {return object;}
 
 private:
-	static FriendDao* getInstance() {return object;}
 	static FriendDao* object;
 
 	FriendDao (): Dao(MYSQLSERVERURL, MYSQLACCOUNT, MYSQLPASSWORD) {

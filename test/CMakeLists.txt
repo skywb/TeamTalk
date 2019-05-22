@@ -15,6 +15,7 @@ add_executable(client testProtobufLogin.cpp)
 #add_executable(testUserDao_del testUserDao_del.cpp)
 #add_executable(testUserDao_update testUserDao_update.cpp)
 #add_executable(ThreadPool testThreadPool.cpp)
+add_executable(Frienddao testFriends.cpp)
 
 
 
@@ -28,6 +29,7 @@ target_link_libraries(testReactor Util Reactor IM server dao mysqlcppconn pthrea
 #target_link_libraries(testUserDao_update dao IM Util Reactor mysqlcppconn gtest gtest_main pthread )
 #target_link_libraries(ThreadPool Reactor IM Util dao mysqlcppconn pthread)
 target_link_libraries(client Reactor IM Util server dao mysqlcppconn pthread)
+target_link_libraries(Frienddao dao Reactor IM Util server mysqlcppconn pthread)
 
 
 
