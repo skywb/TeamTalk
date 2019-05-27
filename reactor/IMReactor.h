@@ -100,31 +100,6 @@ namespace IM {
 
 	};
 
-	///*
-	// * 任务工作线程， 其中callBack是线程回调函数
-	// */
-	//class TaskThread
-	//{
-	//public:
-	//	//typedef  epoll_event Event;
-	//	typedef void* (*callBack) (void *);
-	//	TaskThread ();
-	//	virtual ~TaskThread ();
-
-	//	std::shared_ptr<Task> getTask();
-	//	void addTask(std::shared_ptr<Task> task);
-
-	//	int getTaskCount() { return Tasks.size(); }
-	//	void join(callBack callBack_fun, void* arg);
-	//
-	//private:
-	//	pthread_t pid;
-	//	pthread_cond_t cond;
-	//	pthread_mutex_t _mutex;
-	//	//std::mutex  _mutex;
-	//	std::queue<std::shared_ptr<Task>> Tasks;
-	//};
-
 	class IMReactor
 	{/*{{{*/
 	public:
@@ -134,7 +109,7 @@ namespace IM {
 		static IMReactor* IMReactorInit(const char* IP, uint16_t port);
 		static void optEventListen (Event event);
 		std::shared_ptr<IMConn> getConnecter(int sockfd) {
-			return sockToConn[sockfd];	
+			return sockToConn[sockfd];
 		}
 		void delConnecter(int sockfd) {
 			//从mp中删除这个connecter

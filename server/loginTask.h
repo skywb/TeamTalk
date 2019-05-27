@@ -15,12 +15,7 @@
 class ConnMap
 {
 public:
-	virtual ~ConnMap () {
-	}
-
-	//static void init() {
-	//	object_p = new SockMap();
-	//}
+	virtual ~ConnMap () { }
 
 	//根据用户ID返回Connecter
 	//若用户不在线则返回-1
@@ -57,8 +52,7 @@ private:
 	ConnMap () {
 	}
 	static ConnMap* object_p;
-	std::map<User::Account, std::shared_ptr<IM::IMConn>> m_map;
-	//pthread_mutex_t m_mutex;
+	std::map<User::Account, std::weak_ptr<IM::IMConn>> m_map;
 	std::mutex m_mutex;
 };
 

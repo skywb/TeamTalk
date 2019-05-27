@@ -39,7 +39,7 @@ public:
 	}
 
 	//std::shared_ptr<std::vector<Account> > getFriends() {
-	//	/* TODO: 加锁 */
+	//	/* TODO: getFriends methods */
 	//	if(friends_ptr) return friends_ptr;
 	//	else {
 	//		if(friends.empty()) return nullptr;

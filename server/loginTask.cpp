@@ -11,18 +11,17 @@ std::shared_ptr<IM::IMConn> ConnMap::find(int fd) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	auto p = m_map.find(fd);
 	if(p == m_map.end()) return nullptr;
-	else return p->second;
+	else return p->second.lock();
 }
 
 std::pair<bool, std::shared_ptr<IM::IMConn>> ConnMap::add(std::pair<User::Account, std::shared_ptr<IM::IMConn>> p) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	auto it = m_map.insert(p);
 	if(it.second) {
-		return std::pair<bool, std::shared_ptr<IM::IMConn>> (true, (it.first)->second);
-		
+		return std::pair<bool, std::shared_ptr<IM::IMConn>> (true, (it.first)->second.lock());
 	} else {
-		m_map[p.first] = p.second;
-		return std::pair<bool, std::shared_ptr<IM::IMConn>> (false, nullptr);
+		m_map[p.first] = std::weak_ptr<IM::IMConn> (p.second);
+		return std::pair<bool, std::shared_ptr<IM::IMConn>> (false, it.first->second.lock());
 	}
 }
 
@@ -41,7 +40,6 @@ void LoginTask::doit() {
 	User user;
 	user.setId(request.id());
 	user.setPassword(request.password());
-
 
 	auto userConn = ConnMap::findConnecterById(user.getId());
 	if(userConn != nullptr) {

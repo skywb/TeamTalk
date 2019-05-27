@@ -90,54 +90,16 @@ std::shared_ptr<Task> ThreadPool::getTask() {
 }
 
 bool ThreadPool::addThreadsToPool(size_t num) {
-	/* TODO:  <14-05-19, yourname> */
+	/* TODO: 扩充线程池 * <14-05-19, sky> */
 	(void)num;	
 	return false;
 }
 
 bool ThreadPool::reducedThreadsFromPool(size_t num) {
-	/* TODO:  <14-05-19, yourname> */
+	/* TODO: 缩减线程池中线程数量  <14-05-19, sky> */
 	(void)num;	
 	return false;
 }
-
-
-//TaskThread::TaskThread () {/*{{{*/
-//	pthread_mutex_init(&_mutex, NULL);
-//	pthread_cond_init(&cond, NULL);
-//}/*}}}*/
-//
-//void TaskThread::join(callBack callBack_fun, void* arg) {
-//
-//	::pthread_create(&pid, NULL, callBack_fun, arg);
-//}
-//
-//TaskThread::~TaskThread () {
-//}
-//
-//
-//void TaskThread::addTask(std::shared_ptr<Task> task) {
-//
-//	pthread_mutex_lock(&_mutex);
-//	Tasks.push(task);
-//	::pthread_cond_signal(&cond);
-//	pthread_mutex_unlock(&_mutex);
-//}
-
-
-
-
-
-//std::shared_ptr<Task> TaskThread::getTask() {/*{{{*/
-//	//std::lock_guard<pthread_mutex_t> lock(_mutex);
-//	pthread_mutex_lock(&_mutex);
-//	pthread_cond_wait(&cond, &_mutex);
-//	auto p = Tasks.front();
-//	Tasks.pop();
-//	pthread_mutex_unlock(&_mutex);
-//	return p;
-//}/*}}}*/
-
 
 
 IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
@@ -145,15 +107,6 @@ IMReactor::IMReactor (const char *IP, uint16_t port) {/*{{{*/
 
 	idelTaskNum = 0;
 	idelTaskIndex = 0;
-
-	//启动十个任务线程
-	//for(int i=0; i<10; ++i)
-	//{
-	//	TaskThread* p = new TaskThread();
-	//	threads.push_back(std::shared_ptr<TaskThread> (p));
-	//	threads[i]->join(IMTaskCallBack, (void*)p);
-	//}
-
 
 	//启动线程池
 	threads.start();
