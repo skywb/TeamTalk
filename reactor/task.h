@@ -3,6 +3,7 @@
 
 #include "reactor/Connecter.h"
 #include "IM/IMProtocol.pb.h"
+#include "util/Log.h"
 
 using namespace IM;
 /*
@@ -13,79 +14,73 @@ using namespace IM;
 class Task {
 	public:
 		Task() {}
-
 		virtual void doit() = 0;
-
 		~Task() { }
 };
 
 class IMTask : public Task
 {
 public:
-	IMTask (std::shared_ptr<IMConn> connecter_ptr) :
-		p_con(connecter_ptr) { }
-	virtual ~IMTask () { }
+	//IMTask (std::shared_ptr<IMConn> connecter_ptr) :
+	//	p_con(connecter_ptr) { }
+	IMTask(const Proto::Request* req) : request_base(req) {
+		response_base =  new  Proto::Response();
+		p_con =  nullptr;
+	}
+
+	virtual ~IMTask () {
+		/* 将response返回 */
+		try {
+			if(p_con) {
+				p_con->send(response_base);	
+				Log::log(Log::INFO, "send msg to client");
+			} else {
+				std::cout << "p_con is null" << std::endl;
+			}
+		}catch(...) {
+			Log::log(Log::ERROR, "catch a exception in ~IMTask()");
+		}
+		delete response_base;
+   	}
 
 	void doit() override = 0;
 
+private:
+	std::shared_ptr<IMConn> p_con;
+
 protected:
+	const Proto::Request* request_base;
+	Proto::Response* response_base;
+};
+
+
+
+class WriteableTask : public Task
+{
+public:
+	WriteableTask (std::shared_ptr<IMConn> connecter_ptr) : 
+		p_con(connecter_ptr) { }
+
+	virtual ~WriteableTask () { }
+
+	void doit() override ;
+private:
 	std::shared_ptr<IMConn> p_con;
 };
 
-
-
-class WriteableTask : public IMTask
-{
-	public:
-		WriteableTask (std::shared_ptr<IMConn> connecter_ptr) : 
-			IMTask(connecter_ptr) { }
-
-		virtual ~WriteableTask () { }
-
-		void doit() override ;
-
-};
-
-class ReadableTask : public IMTask
-{
-	public:
-		ReadableTask (std::shared_ptr<IMConn> connecter_ptr) : 
-			IMTask(connecter_ptr) { }
-
-		virtual ~ReadableTask () { }
-
-		void doit() override ;
-
-};
-
-class NewConnectTask : public IMTask
-{
-	public:
-		NewConnectTask (std::shared_ptr<IMConn> connecter_ptr) : 
-			IMTask(connecter_ptr) { }
-
-		virtual ~NewConnectTask () { }
-
-		void doit() override ;
-
-};
-
-/*
-class LoginTask : public IMTask
+class ReadableTask : public Task
 {
 public:
-	LoginTask (std::shared_ptr<IM::LoginPdu> user_p, 
-			std::shared_ptr<IMConn> connecter_ptr) : 
-		IMTask(connecter_ptr),
-		userPdu(user_p) { }
-	virtual ~LoginTask () { }
+	ReadableTask (std::shared_ptr<IMConn> connecter_ptr) : 
+		p_con(connecter_ptr) { }
+
+	virtual ~ReadableTask () { }
 
 	void doit() override ;
 
 private:
-	std::shared_ptr<IM::LoginPdu> userPdu;
+	std::shared_ptr<IMConn> p_con;
 };
 
-*/
 
 #endif /* end of include guard: TASK_H_TKQEYUJB */

@@ -2,9 +2,9 @@
 
 #include "reactor/IMReactor.h"
 #include "reactor/task.h"
-#include "server/loginTask.h"
 #include "dao/UserDao.h"
 #include "util/Log.h"
+#include "server/loginTask.h"
 
 using namespace	IM;
 
@@ -28,16 +28,18 @@ void ReadableTask::doit() {
 					const Proto::Request_login& request_login = request->request_login();
 					std::cout << "login id: " << request_login.id() << std::endl;
 					std::cout << "login password: " << request_login.password() << std::endl;
-					Proto::Response *response = new Proto::Response();
-					Proto::Response_login* response_login = new Proto::Response_login();
-					LoginTask task(request_login, *response_login);
+					LoginTask task(request, p_con);
 					task.doit();
-					response->set_allocated_response_login(response_login);
-					p_con->send(response);
-					delete request;
-					delete response;
+					//delete request;
 				}
 				break;
+			case Proto::Request_Type_FriendInfo:
+				{
+					std::cout << "get friend info" << std::endl;
+					GetFriendInfoTask task(request);
+					task.doit();
+				}
+					break;
 			case Proto::Request_Type_LOGOUT:
 				break;
 			case Proto::Request_Type_SENDMSG:
@@ -79,14 +81,14 @@ void WriteableTask::doit() {
 }
 
 
-void NewConnectTask::doit() {
-	/* 弃用 
-	 * 接受一个或者多个新的连接
-	 * 为每个新的连接创建一个connecter， 并添加到sockToConn中
-	 * 想监听队列中添加一个需要监听的事件
-	 * */
-
-	std::cout << "newConnect task doing..." << std::endl;
-
-}
+//void NewConnectTask::doit() {
+//	/* 弃用 
+//	 * 接受一个或者多个新的连接
+//	 * 为每个新的连接创建一个connecter， 并添加到sockToConn中
+//	 * 想监听队列中添加一个需要监听的事件
+//	 * */
+//
+//	std::cout << "newConnect task doing..." << std::endl;
+//
+//}
 
