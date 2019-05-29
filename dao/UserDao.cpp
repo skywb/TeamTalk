@@ -91,7 +91,6 @@ User* UserDao::_obtain(User::Account id) {
 				user->setId(res->getInt(1));
 				user->setPassword(res->getString(2));
 				user->setName(res->getString(3));
-				user->setFriends(res->getString(4));
 			}
 
 		}catch(sql::SQLException &e) {
