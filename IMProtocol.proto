@@ -2,6 +2,14 @@ syntax = "proto3";
 
 package Proto;
 
+// 账号信息 
+message AccountINFO {
+	uint64  ID  = 1;
+	string name = 2;
+}
+
+
+
 // 
 message Request {
 
@@ -10,12 +18,14 @@ message Request {
 		LOGIN	= 0;
 		LOGOUT	= 1;
 		SENDMSG = 2;
+		FriendInfo = 3;
 	}
 	Type type = 1;
 	oneof pdu {
-		Request_login	request_login	= 11;
-		Request_logout	request_logout	= 12;
-		Request_sendmsg request_sendmsg	= 13;
+		Request_login	request_login			= 11;
+		Request_logout	request_logout			= 12;
+		Request_sendmsg request_sendmsg			= 13;
+		Request_FriendInfo Request_FriendInfo	= 14;
 	}
 }
 
@@ -28,6 +38,7 @@ message Response {
 		LOGOUT	= 1;
 		SENDMSG = 2;
 		MESSAGE = 3;
+		FriendInfo = 4;
 	}
 
 	Type type = 1;
@@ -37,6 +48,7 @@ message Response {
 		Response_sendmsg response_sendmsg	= 13;
 		//其他账号发送的消息
 		Message msg							= 14;
+		Response_FriendInfo Response_FriendInfo	= 15;
 	}
 }
 
@@ -106,4 +118,15 @@ message Message {
 	//MsgType type	=1;
 	uint64 fromID	=2;
 	string msg		=3;
+}
+
+message Request_FriendInfo {
+	uint64 fromID	=1;
+	uint64 friendID =2;
+}
+
+// 返回 ID 的信息
+message Response_FriendInfo {
+	uint64 ID = 1;
+	AccountINFO info  = 2;
 }
