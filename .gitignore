@@ -9,4 +9,5 @@ build/
 tags
 lib/
 bin/
-
+compile_commands.json
+.ccls-cache/

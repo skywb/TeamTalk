@@ -1,3 +1,8 @@
+#ifndef LOG_H_3JS4PIC1
+#define LOG_H_3JS4PIC1
+
+
+
 #include <cassert>
 #include <iostream>
 #include <fstream>
@@ -46,3 +51,4 @@ class Log
 };
 
 
+#endif /* end of include guard: LOG_H_3JS4PIC1 */
