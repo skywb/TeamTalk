@@ -1,13 +1,12 @@
 #include <iostream>
+#include <memory>
 
-#include "IM/IMProtocol.h"
 #include "util/sockUtil.h"
 
-#include "util/testUtil.h"
 
 int main()
 {
-	sockaddr_in addr;
+	::sockaddr_in addr;
 	sockUtil::setNetClientAddr(&addr, "127.0.0.1", 9999);
 	int fd = sockUtil::connectToAddr(&addr);
 	sockUtil::setNoBlock(fd);

@@ -12,7 +12,7 @@ int main()
 	char buf[BUFSIZ];
 	while(true) {
 		//system("clear");
-		std::cout << "类型：1.login 2.logout 3.sendmsg" << std::endl;
+		std::cout << "类型：1.login 2.getFriend 3.sendmsg" << std::endl;
 		std::cin >> cmd;
 		char msg[BUFSIZ];
 		size_t msg_len = 0;
@@ -33,10 +33,15 @@ int main()
 			}
 				break;
 			case 2:
-				//pdu = std::make_shared<IM::Logout> ();
-				//std::cout << "your ID: ";
-				//std::cin >> id;
-				//pdu->setUserId(id);
+			{
+				User::Account id;
+				request->set_type(Proto::Request_Type_FriendInfo);
+				auto getFriend  = new Proto::Request_FriendInfo();
+				getFriend->set_fromid(1000);
+				getFriend->set_friendid(1002);
+				request->set_allocated_request_friendinfo(getFriend);
+				con.send(request);
+			}
 				break;
 			case 3:
 				//pdu = std::make_shared<IM::SendMsgPdu> ();
@@ -88,13 +93,24 @@ int main()
 					default:
 						std::cout << "error" << std::endl;
 						break;
-						
 				}
+			}
+			break;
+			case Proto::Response_Type_FriendInfo:
+			{
+				std::cout << "friend info" << std::endl;
+				if(!response->has_response_friendinfo()) {
+					std::cout << "not has info" << std::endl;
+					break;
+				}
+				auto  info = response->response_friendinfo();
+				std::cout << "id " << info.id() << std::endl;
+				std::cout << "name " << info.info().name() << std::endl;
 			}
 				break;
 			default:
-				std::cout << "other" << std::endl;
-				break;
+			std::cout << "other" << std::endl;
+			break;
 		}
 
 	}
