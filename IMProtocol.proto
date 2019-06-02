@@ -117,7 +117,8 @@ message Message {
 
 	//MsgType type	=1;
 	uint64 fromID	=2;
-	string msg		=3;
+	uint64 toID		=3;
+	string msg		=4;
 }
 
 message Request_FriendInfo {
