@@ -284,7 +284,7 @@ Proto::Response* ClientConn::recive() {
 
 	if(readable == false) 
 	{
-		return 0;
+		return nullptr;
 	}
 
 	int len;
@@ -318,3 +318,14 @@ Proto::Response* ClientConn::recive() {
 
 }
 
+
+void ClientConn::waitMsg() {
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(sockfd, &fds);
+	int cnt = select(sockfd+1, &fds, NULL, NULL, NULL);
+	if (cnt != 1) {
+		std::cout << "error" << std::endl;	
+	}
+	return;
+}

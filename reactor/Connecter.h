@@ -147,9 +147,14 @@ namespace IM {
 	class ClientConn : public Connecter
 	{
 	public:
-		ClientConn (int sockfd) : Connecter(sockfd) { }
+		ClientConn (int sockfd) : Connecter(sockfd) {
+			sockUtil::setNoBlock(sockfd);
+	   	}
 		ClientConn (const char* IP, const uint16_t port);
 		virtual ~ClientConn () {}
+
+
+		void waitMsg();
 
 		bool send(Proto::Request* request);
 		Proto::Response* recive();

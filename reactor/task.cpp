@@ -5,6 +5,7 @@
 #include "dao/UserDao.h"
 #include "util/Log.h"
 #include "server/loginTask.h"
+#include "server/MsgTask.h"
 
 using namespace	IM;
 
@@ -39,35 +40,18 @@ void ReadableTask::doit() {
 					GetFriendInfoTask task(request);
 					task.doit();
 				}
-					break;
+				break;
 			case Proto::Request_Type_LOGOUT:
 				break;
 			case Proto::Request_Type_SENDMSG:
+				{
+					MsgTask task(request, p_con);
+					task.doit();
+				}
 				break;
 			default:
 				break;
-				
 		}
-
-
-
-		//switch (pdu->getCommand()) {
-		//	case IM::LOGIN:
-		//		::IMReactor::getInstances()->addTask(
-		//				std::make_shared<LoginTask>(std::dynamic_pointer_cast<IM::LoginPdu> (pdu), p_con));
-		//		break;
-		//	case IM::LOGOUT:
-		//		std::cout << "logout" << std::endl;
-		//		break;
-		//	case IM::SENDMSG:
-		//		std::cout << "send message" << std::endl;
-		//		break;
-		//	default:
-		//		std::cout << "what are you doing" << std::endl;
-		//		break;
-
-		//}
-
 	}
 
 }
