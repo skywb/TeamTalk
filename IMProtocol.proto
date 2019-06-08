@@ -104,8 +104,10 @@ message Request_sendmsg {
 //请求发送消
 message Response_sendmsg {
 	uint32 msgID	= 1;
+	//是否发送成功
 	bool stat		= 2;
-	// Next available id: 1
+	//信息提示
+	string errmsg   = 3;
 }
 
 // 消息推送
