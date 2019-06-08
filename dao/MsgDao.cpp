@@ -24,6 +24,7 @@ bool MsgDao::_insert(Proto::Message* msg) {
 		pre_stmt->setBoolean(4, true);
 		pre_stmt->setInt(5, 1);
 		//pre_stmt->setDateTime(7, boost::posix_time::to_simple_string(p));
+		/* TODO: 添加时间戳 <06-06-19, sky> */
 
 		int re  = pre_stmt->executeUpdate();
 		delete pre_stmt;

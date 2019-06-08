@@ -29,6 +29,7 @@ class Dao
 		Dao (const char* hostname, const char* userName, const char* password) {
 			driver = sql::mysql::get_driver_instance();
 			conn = driver->connect(hostname, userName, password);
+			conn->createStatement()->execute("use teamtalk");
 		}
 };
 

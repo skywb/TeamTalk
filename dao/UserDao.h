@@ -6,8 +6,7 @@
 class UserDao : public DBUtil::Dao
 {
 public:
-	virtual ~UserDao () {
-	}
+	virtual ~UserDao () { }
 
 	bool _insert(User *user);
 	bool _delete(User::Account id);
@@ -24,9 +23,7 @@ private:
 	static UserDao* getInstance() {return object;}
 	static UserDao* object;
 
-	UserDao (): Dao(MYSQLSERVERURL, MYSQLACCOUNT, MYSQLPASSWORD) {
-			conn->createStatement()->execute("use teamtalk");
-   	}
+	UserDao (): Dao(MYSQLSERVERURL, MYSQLACCOUNT, MYSQLPASSWORD) { }
 };
 
 #endif /* end of include guard: USERDAO_H_SHOUYAFC */
