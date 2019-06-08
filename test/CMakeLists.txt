@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 2.8.2)
 
 #add_executable(test testProtocol.cpp)
 add_executable(testReactor testReactor.cpp)
-add_executable(client testProtobufLogin.cpp)
+add_executable(client client.cpp)
 #add_executable(ProtocolServer ProtocolServer.cpp Mytask.cpp)
 #add_executable(ProtocolClient ProtocolClient.cpp)
 #add_executable(testDao testUserDao.cpp)
@@ -15,7 +15,8 @@ add_executable(client testProtobufLogin.cpp)
 #add_executable(testUserDao_del testUserDao_del.cpp)
 #add_executable(testUserDao_update testUserDao_update.cpp)
 #add_executable(ThreadPool testThreadPool.cpp)
-add_executable(Frienddao testFriends.cpp)
+#add_executable(Frienddao testFriends.cpp)
+add_executable(testMsgDao testMsgDao.cpp)
 
 
 
@@ -29,7 +30,8 @@ target_link_libraries(testReactor Util Reactor IM server dao mysqlcppconn pthrea
 #target_link_libraries(testUserDao_update dao IM Util Reactor mysqlcppconn gtest gtest_main pthread )
 #target_link_libraries(ThreadPool Reactor IM Util dao mysqlcppconn pthread)
 target_link_libraries(client Reactor IM Util server dao mysqlcppconn pthread)
-target_link_libraries(Frienddao dao Reactor IM Util server mysqlcppconn pthread)
+#target_link_libraries(Frienddao dao Reactor IM Util server mysqlcppconn pthread)
+target_link_libraries(testMsgDao  dao Reactor IM Util server mysqlcppconn pthread)
 
 
 

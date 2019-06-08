@@ -1,14 +1,18 @@
+#include <iostream>
+#include <thread>
+
 #include "reactor/IMReactor.h"
+#include "reactor/Connecter.h"
 #include "IM/IMProtocol.pb.h"
 #include "IM/User.h"
 
 
-void reciveMsg(ClientConn con) {
+void reciveMsg(ClientConn* con) {
 	while(true) {
-		auto response = con.recive();
+		auto response = con->recive();
 		while (response == nullptr){ 
-			con.waitMsg();
-			response = con.recive();
+			con->waitMsg();
+			response = con->recive();
 		}
 		if(!response) {
 			std::cout << "response is null" << std::endl;
@@ -64,6 +68,20 @@ void reciveMsg(ClientConn con) {
 					std::cout << "stat " << res.stat() << std::endl;
 				}
 				break;
+			case Proto::Response_Type_MESSAGE:
+			{
+				std::cout << "recive new message " << std::endl;
+
+				if (!response->has_msg()) {
+					std::cout << "not has msg" << std::endl;
+					break;
+				}
+				auto msg = response->msg();
+				std::cout << "from : " << msg.fromid() << std::endl;
+				std::cout << "to : " << msg.toid() << std::endl;
+				std::cout << "message : " << msg.msg() << std::endl;
+			}
+					break;
 			default:
 				std::cout << "other" << std::endl;
 				break;
@@ -78,6 +96,7 @@ void reciveMsg(ClientConn con) {
 int main()
 {
 	ClientConn con("127.0.0.1", 9999);
+	std::thread th(reciveMsg, &con);
 
 	int cmd;
 	Proto::Request* request = new Proto::Request();
@@ -126,7 +145,8 @@ int main()
 				send->set_objid(objId);
 				std::string msg;
 				std::cout << "MSG : ";
-				std::cin >> msg;	
+				getchar();
+				std::getline(std::cin, msg);
 				send->set_msg(msg);
 				request->set_allocated_request_sendmsg(send);
 				con.send(request);
