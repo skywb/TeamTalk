@@ -26,6 +26,14 @@ class ConnMap
 			return object_p->find(id);
 		}
 
+		static bool userIsOnline(User::Account id) {
+			if(object_p == nullptr) {
+				std::cout << "object_p is nullptr" << std::endl;
+			}
+			return (object_p->find(id) != nullptr);
+
+		}
+
 		//添加一个在线用户
 		//若已经在线返回false
 		static std::pair<bool, std::shared_ptr<IM::IMConn>> addAccount(std::pair<User::Account, std::shared_ptr<IM::IMConn>> p) {

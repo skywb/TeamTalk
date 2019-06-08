@@ -33,42 +33,6 @@ bool ConnMap::del(std::pair<User::Account, std::shared_ptr<IM::IMConn>> p) {
 	return true;
 }
 
-
-
-
-/*
-void LoginTask::doit() {
-	User user;
-	user.setId(request.id());
-	user.setPassword(request.password());
-
-	auto userConn = ConnMap::findConnecterById(user.getId());
-	if(userConn != nullptr) {
-		response->set_stat(Proto::Response_login_STAT_ERROR);
-		return ;
-	}
-
-	User* dbUser = UserDao::Obtain(user.getId());
-
-	//账号不存在
-	if(dbUser == nullptr) {
-		response->set_stat(Proto::Response_login_STAT_ACCOUNT_NULL);
-		return ;
-	}
-	//登录成功
-	if(user.getPassword() == dbUser->getPassword()) {
-
-		response->set_stat(Proto::Response_login_STAT_SUCCESS);
-		response->set_friends(dbUser->getFriends());
-		//ConnMap::addAccount(std::make_pair(user.getId(), p_con));
-
-	} else { //密码错误
-		response->set_stat(Proto::Response_login_STAT_PASSWORD_ERROR);
-   	}
-
-}
-*/
-
 void LoginTask::doit() {
 	auto login = request->request_login();
 	User user;
@@ -78,6 +42,9 @@ void LoginTask::doit() {
 	auto re =  new Proto::Response_login();
 	auto userConn = ConnMap::findConnecterById(user.getId());
 	if(userConn != nullptr) {
+		#ifdef NDEBUG
+			std::cout << "账号已在线" << std::endl;
+		#endif
 		re->set_stat(Proto::Response_login_STAT_ERROR);
 		return ;
 	}
@@ -128,9 +95,9 @@ void GetFriendInfoTask::doit() {
 	if(con)
 	{
 		con->send(response);
-		std::cout << "发送成功" << std::endl;
+		//std::cout << "发送成功" << std::endl;
 	} else   {
-		std::cout << "发送失败" << std::endl;
+		//std::cout << "发送失败" << std::endl;
 	}
 	delete response;
 }
