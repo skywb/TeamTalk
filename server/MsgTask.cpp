@@ -1,5 +1,6 @@
 #include "MsgTask.h"
 #include "util/Log.h"
+#include "dao/MsgDao.h"
 
 void MsgTask::doit() {
 	Log::log(Log::INFO, "recive sendmsg request");
@@ -34,15 +35,18 @@ void MsgTask::doit() {
 	//未判断是否为真实用户
 	if(ConnMap::userIsOnline(objId)) {
 		//对方在线, 直接发送给用户
-		auto objCon = ConnMap::findConnecterById(objId);
 		auto objRe = new Proto::Response();
 		objRe->set_type(Proto::Response_Type_MESSAGE);
 		auto objmsg = new Proto::Message();
 		objmsg->set_msg(msg.msg());
 		objmsg->set_fromid(msg.id());
 		objmsg->set_toid(msg.objid());
+		objmsg->set_recived(true);
+		//插入数据库
+		MsgDao::Insert(objmsg);
 
 		objRe->set_allocated_msg(objmsg);
+		auto objCon = ConnMap::findConnecterById(objId);
 		objCon->send(objRe);
 
 		auto msgre = new Proto::Response_sendmsg();
@@ -54,9 +58,20 @@ void MsgTask::doit() {
 			std::cout << "sendmsg succed" << std::endl;
 		#endif
 	} else {
-		//TODO:不在线， 添加到数据库中
-		
+		auto objmsg = new Proto::Message();
+		objmsg->set_msg(msg.msg());
+		objmsg->set_fromid(msg.id());
+		objmsg->set_toid(msg.objid());
+		objmsg->set_recived(false);
+		//插入数据库
+		MsgDao::Insert(objmsg);
+		delete objmsg;
 		std::cout << "对方不在线" << std::endl;
+		auto msgre = new Proto::Response_sendmsg();
+		msgre->set_stat(true);
+		msgre->set_msgid(1);
+		response->set_allocated_response_sendmsg(msgre);
+		p_con->send(response);
 	}
 	
 

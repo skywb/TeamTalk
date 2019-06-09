@@ -12,19 +12,22 @@ bool MsgDao::_insert(Proto::Message* msg) {
 	 * 向数据库中插入一个msg
 	 */
 
-	//auto p = boost::posix_time::second_clock::local_time();
 	sql::PreparedStatement *pre_stmt;
 	try {
 	
 		pre_stmt = conn->prepareStatement(
-				"insert into messages values(null, ?, ?, ?, ?, ?, null)");	
+				"insert into messages values(null, ?, ?, ?, ?, ?, ?)");	
 		pre_stmt->setInt(1, msg->fromid());
 		pre_stmt->setInt(2, msg->toid());
 		pre_stmt->setString(3, msg->msg());
-		pre_stmt->setBoolean(4, true);
+		pre_stmt->setBoolean(4, msg->recived());
 		pre_stmt->setInt(5, 1);
-		//pre_stmt->setDateTime(7, boost::posix_time::to_simple_string(p));
-		/* TODO: 添加时间戳 <06-06-19, sky> */
+		
+		//获取当前时间
+		char curTime[32];
+		time_t now = time(nullptr);
+		strftime(curTime, 32, "%Y-%m-%d %H:%M:%S", localtime(&now));
+		pre_stmt->setDateTime(6, curTime);
 
 		int re  = pre_stmt->executeUpdate();
 		delete pre_stmt;
