@@ -118,9 +118,11 @@ message Message {
 	//}
 
 	//MsgType type	=1;
-	uint64 fromID	=2;
-	uint64 toID		=3;
-	string msg		=4;
+	uint64 fromID	= 2;
+	uint64 toID		= 3;
+	string msg		= 4;
+	bool recived	= 5;
+	string msgTime  = 6;
 }
 
 message Request_FriendInfo {
